@@ -26,6 +26,7 @@ import (
 	"github.com/Netflix/chaosmonkey/deploy"
 	"github.com/Netflix/chaosmonkey/deps"
 	"github.com/Netflix/chaosmonkey/grp"
+	"github.com/Netflix/chaosmonkey/eligible"
 )
 
 type leashedKiller struct {
@@ -133,12 +134,7 @@ func doTerminate(d deps.Deps, group grp.InstanceGroup) error {
 		return nil
 	}
 
-	app, err := d.Dep.GetApp(appName)
-	if err != nil {
-		return errors.Wrapf(err, "GetApp failed for %s", appName)
-	}
-
-	instance, ok := PickRandomInstance(group, *appCfg, app)
+	instance, ok := PickRandomInstance(group, *appCfg, d.Dep)
 	if !ok {
 		log.Printf("No eligible instances in group, nothing to terminate: %+v", group)
 		return nil
@@ -183,8 +179,8 @@ func doTerminate(d deps.Deps, group grp.InstanceGroup) error {
 }
 
 // PickRandomInstance randomly selects an eligible instance from a group
-func PickRandomInstance(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, app *deploy.App) (chaosmonkey.Instance, bool) {
-	instances := EligibleInstances(group, cfg, app)
+func PickRandomInstance(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.Deployment) (chaosmonkey.Instance, bool) {
+	instances := eligible.Instances(group, cfg, dep)
 	if len(instances) == 0 {
 		return nil, false
 	}
