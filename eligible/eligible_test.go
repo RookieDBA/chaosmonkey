@@ -20,7 +20,10 @@ func TestInstancesCluster(t *testing.T) {
 	group := grp.New("foo", "prod", "us-east-1", "", "foo-prod")
 
 	// code under test
-	instances := Instances(group, appConfig, dep)
+	instances, err := Instances(group, appConfig, dep)
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
 
 	// assertions
 	wants := []string{"i-25b866ab", "i-892d46d5"}
