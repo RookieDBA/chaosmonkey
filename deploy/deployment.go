@@ -33,6 +33,9 @@ type Deployment interface {
 
 	// AppNames returns the names of all apps
 	AppNames() ([]string, error)
+
+	// GetInstanceIDs returns the ids for instances in a cluster
+	GetInstanceIDs(app string, account AccountName, region RegionName, cluster ClusterName) (instances []InstanceID, err error)
 }
 
 // Account represents the set of clusters associated with an App that reside
