@@ -26,8 +26,7 @@ func TestInstancesCluster(t *testing.T) {
 	}
 
 	// assertions
-	wants := []string{"i-25b866ab", "i-892d46d5"}
-
+	wants := []string{"i-d3e3d611", "i-63f52e25"}
 
 	if got, want := len(instances), 2; got != want {
 		t.Fatalf("len(eligible.Instances(group, cfg, app))=%v, want %v", got, want)
