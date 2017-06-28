@@ -6,6 +6,7 @@ import (
 	"github.com/Netflix/chaosmonkey"
 	"github.com/Netflix/chaosmonkey/deploy"
 	"github.com/pkg/errors"
+	"github.com/SmartThingsOSS/frigga-go"
 )
 
 type instance struct{
@@ -39,6 +40,14 @@ func (i instance) ClusterName() string {
 	return i.clusterName
 }
 
+func (i instance) ASGName() string {
+	return i.asgName
+}
+
+func (i instance) Name() string {
+	return i.clusterName
+}
+
 func (i instance) ID() string {
 	return i.id
 }
@@ -65,33 +74,33 @@ func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.De
 	result := make([]chaosmonkey.Instance, 0)
 
 
-	provider, err := dep.CloudProvider(group.Account())
+	cloudProvider, err := dep.CloudProvider(group.Account())
 	if err != nil {
 		return nil, errors.Wrap(err, "retrieve cloud provider failed")
 	}
 
-	ids, err := dep.GetInstanceIDs(group.App(), group.Account(), region, cluster)
-
-
+	asgName, ids, err := dep.GetInstanceIDs(group.App(),deploy.AccountName(group.Account()), deploy.RegionName(region), deploy.ClusterName(cluster))
 
 	if err!=nil {
 		return nil, err
 	}
 
 	for _, id := range ids {
+		names, err := frigga.Parse(string(asgName))
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to parse")
+		}
 		result = append(result,
 			instance{appName: group.App(),
 				accountName: group.Account(),
 				regionName: region,
-				stackName: ???,
-				clusterName: ???,
-				asgName: ???,
-				id: id,
-				cloudProvider, group.
-
+				stackName: names.Stack,
+				clusterName: names.Cluster,
+				asgName: string(asgName),
+				id: string(id),
+				cloudProvider: cloudProvider,
 			})
 	}
 
-
-
+	return result, nil
 }

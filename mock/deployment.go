@@ -86,19 +86,22 @@ func (d deployment) CloudProvider(account string) (string, error) {
 }
 
 
-func (d deployment) GetInstanceIDs(app string, account D.AccountName, region D.RegionName, cluster D.ClusterName) (instances []D.InstanceID, err error) {
+func (d deployment) GetInstanceIDs(app string, account D.AccountName, region D.RegionName, cluster D.ClusterName) (D.ASGName, []D.InstanceID, error) {
 	// asgs associated with the cluster
 	asgs := d.apps[app][account].Clusters[cluster][region]
 
-	instances = make([]D.InstanceID, 0)
+	instances := make([]D.InstanceID, 0)
 
 	// We assume there's only one asg, and retrieve the instances
-	for _, ids := range asgs {
+	var asg D.ASGName
+	var ids []D.InstanceID
+
+	for asg, ids = range asgs {
 		for _, id := range ids {
 			instances = append(instances, id)
 		}
 	}
 
-	return instances, nil
+	return asg, instances, nil
 }
 
