@@ -143,7 +143,7 @@ type group struct {
 }
 
 func (g group) String() string {
-	return fmt.Sprintf("app=%s account=%s region=%s stack=%s cluster=%s", g.app, g.account, g.region, g.stack, g.cluster)
+	return fmt.Sprintf("InstanceGroup{app=%s account=%s region=%s stack=%s cluster=%s}", g.app, g.account, g.region, g.stack, g.cluster)
 }
 
 func (g group) MarshalJSON() ([]byte, error) {
