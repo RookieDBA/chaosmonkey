@@ -56,7 +56,7 @@ func Terminate(d deps.Deps, app string, account string, region string, stack str
 	}
 
 	if !enabled {
-		log.Printf("not terminating: enabled=false")
+		log.Println("not terminating: enabled=false")
 		return nil
 	}
 
@@ -68,7 +68,7 @@ func Terminate(d deps.Deps, app string, account string, region string, stack str
 	}
 
 	if problem {
-		log.Printf("not terminating: outage in progress")
+		log.Println("not terminating: outage in progress")
 		return nil
 	}
 
