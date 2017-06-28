@@ -37,6 +37,9 @@ type Deployment interface {
 	// GetInstanceIDs returns the ids for instances in a cluster
 	GetInstanceIDs(app string, account AccountName, cloudProvider string, region RegionName, cluster ClusterName) (asgName ASGName, instances []InstanceID, err error)
 
+	// GetClusterNames returns the list of cluster names
+	GetClusterNames(app string, account AccountName) ([]ClusterName, error)
+
 	// CloudProvider returns the provider associated with an account
 	CloudProvider(account string) (provider string, err error)
 }

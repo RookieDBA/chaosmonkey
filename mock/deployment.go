@@ -65,6 +65,15 @@ func (d deployment) Apps(c chan<- *D.App, apps []string) {
 	}
 }
 
+func (d deployment) GetClusterNames(app string, account D.AccountName) ([]D.ClusterName, error) {
+	result := make([]D.ClusterName, 0)
+	for cluster := range d.apps[app][account].Clusters {
+		result = append(result, cluster)
+	}
+
+	return result, nil
+}
+
 // AppNames implements deploy.Deployment.AppNames
 func (d deployment) AppNames() ([]string, error) {
 	result := make([]string, len(d.apps), len(d.apps))

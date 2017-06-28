@@ -58,19 +58,27 @@ func (i instance) CloudProvider() string {
 
 // Instances returns instances eligible for termination
 func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
-	// Fail if not cluster-specific
-	cluster, ok := group.Cluster()
-	if !ok {
-		return nil, errors.New("only supports cluster-specific grouping")
-	}
-
-	// Fail if not region-specific
-
 	region, ok := group.Region()
 	if !ok {
 		return nil, errors.New("only supports region-specific grouping")
 	}
 
+	// Fail if not cluster-specific
+	cluster, ok := group.Cluster()
+	if ok {
+		// Fail if not region-specific
+		return clusterRegionInstances(deploy.ClusterName(cluster), region, group, dep)
+	}
+
+	_, ok = group.Stack()
+	if ok {
+		return nil, errors.New("only supports app and cluster-specific grouping")
+	}
+
+	return appRegionInstances(group.App(), region, group, dep)
+}
+
+func clusterRegionInstances(cluster deploy.ClusterName, region string, group grp.InstanceGroup, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
 	result := make([]chaosmonkey.Instance, 0)
 
 
@@ -103,4 +111,23 @@ func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.De
 	}
 
 	return result, nil
+}
+
+func appRegionInstances(app string, region string, group grp.InstanceGroup, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
+	clusters, err := dep.GetClusterNames(app, deploy.AccountName(group.Account()))
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]chaosmonkey.Instance, 0)
+	for _, cluster := range clusters {
+		instances, err := clusterRegionInstances(cluster, region, group, dep)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, instances...)
+	}
+
+	return result, nil
+
 }
