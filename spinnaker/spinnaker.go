@@ -456,3 +456,7 @@ func (s Spinnaker) CloudProvider(account string) (provider string, err error) {
 
 	return fields.CloudProvider, nil
 }
+
+func (s Spinnaker) GetClusterNames(app string, account D.AccountName) ([]D.ClusterName, error) {
+	return nil, errors.New("not yet impelmented")
+}
