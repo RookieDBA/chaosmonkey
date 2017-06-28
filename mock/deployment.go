@@ -16,6 +16,8 @@ package mock
 
 import D "github.com/Netflix/chaosmonkey/deploy"
 
+const cloudProvider = "aws"
+
 // Deployment returns a mock implementation of deploy.Deployment
 // Deployment has 4 apps: foo, bar, baz, quux
 // Each app runs in 1 account:
@@ -30,10 +32,10 @@ func Deployment() D.Deployment {
 	usEast1 := D.RegionName("us-east-1")
 
 	return &deployment{map[string]D.AppMap{
-		"foo":  {prod: D.AccountInfo{CloudProvider: "aws", Clusters: D.ClusterMap{"foo-prod": {usEast1: {"foo-prod-v001": []D.InstanceID{"i-d3e3d611", "i-63f52e25"}}}}}},
-		"bar":  {prod: D.AccountInfo{CloudProvider: "aws", Clusters: D.ClusterMap{"bar-prod": {usEast1: {"bar-prod-v011": []D.InstanceID{"i-d7f06d45", "i-ce433cf1"}}}}}},
-		"baz":  {prod: D.AccountInfo{CloudProvider: "aws", Clusters: D.ClusterMap{"baz-prod": {usEast1: {"baz-prod-v004": []D.InstanceID{"i-25b86646", "i-573d46d5"}}}}}},
-		"quux": {test: D.AccountInfo{CloudProvider: "aws", Clusters: D.ClusterMap{"quux-test": {usEast1: {"quux-test-v004": []D.InstanceID{"i-25b866ab", "i-892d46d5"}}}}}},
+		"foo":  {prod: D.AccountInfo{CloudProvider: cloudProvider, Clusters: D.ClusterMap{"foo-prod": {usEast1: {"foo-prod-v001": []D.InstanceID{"i-d3e3d611", "i-63f52e25"}}}}}},
+		"bar":  {prod: D.AccountInfo{CloudProvider: cloudProvider, Clusters: D.ClusterMap{"bar-prod": {usEast1: {"bar-prod-v011": []D.InstanceID{"i-d7f06d45", "i-ce433cf1"}}}}}},
+		"baz":  {prod: D.AccountInfo{CloudProvider: cloudProvider, Clusters: D.ClusterMap{"baz-prod": {usEast1: {"baz-prod-v004": []D.InstanceID{"i-25b86646", "i-573d46d5"}}}}}},
+		"quux": {test: D.AccountInfo{CloudProvider: cloudProvider, Clusters: D.ClusterMap{"quux-test": {usEast1: {"quux-test-v004": []D.InstanceID{"i-25b866ab", "i-892d46d5"}}}}}},
 	}}
 }
 
@@ -78,6 +80,11 @@ func (d deployment) AppNames() ([]string, error) {
 func (d deployment) GetApp(name string) (*D.App, error) {
 	return D.NewApp(name, d.apps[name]), nil
 }
+
+func (d deployment) CloudProvider(account string) (string, error) {
+	return cloudProvider, nil
+}
+
 
 func (d deployment) GetInstanceIDs(app string, account D.AccountName, region D.RegionName, cluster D.ClusterName) (instances []D.InstanceID, err error) {
 	// asgs associated with the cluster

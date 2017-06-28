@@ -22,7 +22,7 @@ func TestInstancesCluster(t *testing.T) {
 	// code under test
 	instances, err := Instances(group, appConfig, dep)
 	if err != nil {
-		t.Fatalf("%v", err)
+		t.Fatalf("%+v", err)
 	}
 
 	// assertions
