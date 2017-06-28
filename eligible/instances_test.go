@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package term
+package eligible
 
 import (
 	"testing"
@@ -119,7 +119,7 @@ func TestGetEligibleInstances(t *testing.T) {
 	group := grp.New("mock", "prod", "us-east-1", "", "mock-prod-a")
 	cfg := testConfig(chaosmonkey.Cluster)
 
-	instances := EligibleInstances(group, cfg, app)
+	instances := Instances(group, cfg, app)
 	got, want := len(instances), 1
 	if got != want {
 		t.Fatalf("len(eligibleInstances(group, cfg, app))=%v, want %v", got, want)
