@@ -41,7 +41,7 @@ type InstanceGroup interface {
 	// App returns the name of the app
 	App() string
 
-	// Account returns the name of the app
+	// Account returns the name of the account
 	Account() string
 
 	// Region returns (region name, region present)
