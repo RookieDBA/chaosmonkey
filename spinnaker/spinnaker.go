@@ -224,13 +224,8 @@ func (s Spinnaker) Apps(c chan<- *D.App, appNames []string) {
 }
 
 // GetInstanceIDs gets the instance ids for a cluster
-func (s Spinnaker) GetInstanceIDs(app string, account D.AccountName, region D.RegionName, cluster D.ClusterName) (instances []D.InstanceID, err error) {
-	_, err = s.CloudProvider(account)
-	if err != nil {
-		return nil, errors.Wrap(err, "retrieve cloud provider failed")
-	}
-
-	return instances, errors.New("not yet implemented")
+func (s Spinnaker) GetInstanceIDs(app string, account D.AccountName, cloudProvider string, region D.RegionName, cluster D.ClusterName) (D.ASGName, []D.InstanceID, error) {
+	return "", nil, errors.New("not yet implemented")
 }
 
 // GetApp implements deploy.Deployment.GetApp

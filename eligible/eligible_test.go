@@ -7,7 +7,7 @@ import (
 	"github.com/Netflix/chaosmonkey/mock"
 )
 
-func TestInstancesCluster(t *testing.T) {
+func TestClusterGropuing(t *testing.T) {
 	// setup
 	appConfig := chaosmonkey.AppConfig{
 		Enabled:                        true,

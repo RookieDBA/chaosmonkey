@@ -18,6 +18,7 @@ package grp
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 )
 
 // New generates an InstanceGroup.
@@ -54,6 +55,9 @@ type InstanceGroup interface {
 	// Cluster returns (cluster name, cluster present)
 	// If the group is cross-cluster, the boolean will be false
 	Cluster() (name string, ok bool)
+
+	// String outputs a stringified rep
+	String() string
 }
 
 // Equal returns true if g1 and g2 represent the same group of instances
@@ -136,6 +140,10 @@ func String(group InstanceGroup) string {
 
 type group struct {
 	app, account, region, stack, cluster string
+}
+
+func (g group) String() string {
+	return fmt.Sprintf("app=%s account=%s region=%s stack=%s cluster=%s", g.app, g.account, g.region, g.stack, g.cluster)
 }
 
 func (g group) MarshalJSON() ([]byte, error) {

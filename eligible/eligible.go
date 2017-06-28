@@ -79,7 +79,7 @@ func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.De
 		return nil, errors.Wrap(err, "retrieve cloud provider failed")
 	}
 
-	asgName, ids, err := dep.GetInstanceIDs(group.App(),deploy.AccountName(group.Account()), deploy.RegionName(region), deploy.ClusterName(cluster))
+	asgName, ids, err := dep.GetInstanceIDs(group.App(),deploy.AccountName(group.Account()), cloudProvider, deploy.RegionName(region), deploy.ClusterName(cluster))
 
 	if err!=nil {
 		return nil, err

@@ -180,7 +180,11 @@ func doTerminate(d deps.Deps, group grp.InstanceGroup) error {
 
 // PickRandomInstance randomly selects an eligible instance from a group
 func PickRandomInstance(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.Deployment) (chaosmonkey.Instance, bool) {
-	instances := eligible.Instances(group, cfg, dep)
+	instances, err := eligible.Instances(group, cfg, dep)
+	if err != nil {
+		log.Printf("WARNING: eligible.Instances failed for %s: %v", group, err)
+		return nil, false
+	}
 	if len(instances) == 0 {
 		return nil, false
 	}
