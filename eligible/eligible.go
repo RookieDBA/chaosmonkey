@@ -58,6 +58,10 @@ func (i instance) CloudProvider() string {
 
 // Instances returns instances eligible for termination
 func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
+	if !cfg.Enabled {
+		return nil, nil
+	}
+
 	region, ok := group.Region()
 	if !ok {
 		return nil, errors.New("only supports region-specific grouping")
