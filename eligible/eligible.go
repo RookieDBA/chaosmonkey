@@ -7,6 +7,7 @@ import (
 	"github.com/Netflix/chaosmonkey/deploy"
 	"github.com/pkg/errors"
 	"github.com/SmartThingsOSS/frigga-go"
+	"log"
 )
 
 type instance struct{
@@ -56,42 +57,68 @@ func (i instance) CloudProvider() string {
 	return i.cloudProvider
 }
 
+
+func isException(exs []chaosmonkey.Exception, account deploy.AccountName, cluster deploy.ClusterName, region deploy.RegionName) bool {
+	names, err := frigga.Parse(string(cluster))
+	if err != nil {
+		log.Printf("ERROR Couldn't parse cluster name %s", cluster)
+		return false
+	}
+
+	for _, ex := range exs {
+		if ex.Matches(string(account), names.Stack, names.Detail, string(region)) {
+			return true
+		}
+	}
+	return false
+}
+
 // Instances returns instances eligible for termination
 func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
 	if !cfg.Enabled {
 		return nil, nil
 	}
 
-	region, ok := group.Region()
+	r, ok := group.Region()
 	if !ok {
 		return nil, errors.New("only supports region-specific grouping")
 	}
 
-	// Fail if not cluster-specific
-	cluster, ok := group.Cluster()
-	if ok {
-		// Fail if not region-specific
+	region := deploy.RegionName(r)
+
+	switch cfg.Grouping {
+	case chaosmonkey.App:
+		return appRegionInstances(group.App(), cfg.Exceptions, region, group, dep)
+	case chaosmonkey.Stack:
+		return nil, errors.New("stack-level grouping not yet implemented")
+	case chaosmonkey.Cluster:
+		cluster, ok := group.Cluster()
+		if !ok {
+			return nil, errors.Errorf("app %s is configured cluster-only but not cluster specified in group %s", group.App(), group)
+		}
+
+		if isException(cfg.Exceptions, deploy.AccountName(group.Account()), deploy.ClusterName(cluster), region) {
+			return nil, nil
+		}
+
 		return clusterRegionInstances(deploy.ClusterName(cluster), region, group, dep)
+	default:
+		return nil, errors.New("only app/stack/cluster groupings supported")
 	}
 
-	_, ok = group.Stack()
-	if ok {
-		return nil, errors.New("only supports app and cluster-specific grouping")
-	}
-
-	return appRegionInstances(group.App(), region, group, dep)
 }
 
-func clusterRegionInstances(cluster deploy.ClusterName, region string, group grp.InstanceGroup, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
-	result := make([]chaosmonkey.Instance, 0)
+func clusterRegionInstances(cluster deploy.ClusterName, region deploy.RegionName, group grp.InstanceGroup, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
 
+
+	result := make([]chaosmonkey.Instance, 0)
 
 	cloudProvider, err := dep.CloudProvider(group.Account())
 	if err != nil {
 		return nil, errors.Wrap(err, "retrieve cloud provider failed")
 	}
 
-	asgName, ids, err := dep.GetInstanceIDs(group.App(),deploy.AccountName(group.Account()), cloudProvider, deploy.RegionName(region), deploy.ClusterName(cluster))
+	asgName, ids, err := dep.GetInstanceIDs(group.App(),deploy.AccountName(group.Account()), cloudProvider, region, deploy.ClusterName(cluster))
 
 	if err!=nil {
 		return nil, err
@@ -105,7 +132,7 @@ func clusterRegionInstances(cluster deploy.ClusterName, region string, group grp
 		result = append(result,
 			instance{appName: group.App(),
 				accountName: group.Account(),
-				regionName: region,
+				regionName: string(region),
 				stackName: names.Stack,
 				clusterName: names.Cluster,
 				asgName: string(asgName),
@@ -117,14 +144,20 @@ func clusterRegionInstances(cluster deploy.ClusterName, region string, group grp
 	return result, nil
 }
 
-func appRegionInstances(app string, region string, group grp.InstanceGroup, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
-	clusters, err := dep.GetClusterNames(app, deploy.AccountName(group.Account()))
+func appRegionInstances(app string, exs []chaosmonkey.Exception, region deploy.RegionName, group grp.InstanceGroup, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
+	account := deploy.AccountName(group.Account())
+	clusters, err := dep.GetClusterNames(app, account)
 	if err != nil {
 		return nil, err
 	}
 
 	result := make([]chaosmonkey.Instance, 0)
 	for _, cluster := range clusters {
+
+		if isException(exs, account, cluster, region) {
+			continue
+		}
+
 		instances, err := clusterRegionInstances(cluster, region, group, dep)
 		if err != nil {
 			return nil, err
