@@ -20,3 +20,6 @@ test:
 
 build:
 	go build github.com/Netflix/chaosmonkey/cmd/chaosmonkey
+
+fix:
+	gofmt -w `find . -name '*.go' | grep -Ev '/vendor/|/migration'`
