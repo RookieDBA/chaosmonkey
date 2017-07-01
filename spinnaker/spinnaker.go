@@ -260,7 +260,7 @@ func (s Spinnaker) GetInstanceIDs(app string, account D.AccountName, cloudProvid
 	asg := D.ASGName(data.Name)
 	instances := make([]D.InstanceID, len(data.Instances))
 	for i, instance := range data.Instances {
-		instances[i] = D.InstanceID(instance)
+		instances[i] = D.InstanceID(instance.Name)
 	}
 
 	return asg, instances, nil
