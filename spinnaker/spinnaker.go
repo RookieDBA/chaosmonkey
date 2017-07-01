@@ -247,8 +247,8 @@ func (s Spinnaker) GetInstanceIDs(app string, account D.AccountName, cloudProvid
 		return "", nil, errors.Wrap(err, fmt.Sprintf("body read failed at %s", url))
 	}
 
-	var data struct{
-		Name string
+	var data struct {
+		Name      string
 		Instances []struct{ Name string }
 	}
 
