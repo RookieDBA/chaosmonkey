@@ -10,51 +10,62 @@ import (
 	"log"
 )
 
-type instance struct{
-	appName string
-	accountName string
-	regionName string
-	stackName string
-	clusterName string
-	asgName string
-	id string
-	cloudProvider string
-}
+type (
+
+	cluster struct {
+		appName deploy.AppName
+		accountName deploy.AccountName
+		cloudProvider deploy.CloudProvider
+		regionName deploy.RegionName
+		clusterName deploy.ClusterName
+	}
+
+	instance struct{
+		appName deploy.AppName
+		accountName deploy.AccountName
+		regionName deploy.RegionName
+		stackName deploy.StackName
+		clusterName deploy.ClusterName
+		asgName deploy.ASG
+		id deploy.InstanceID
+		cloudProvider deploy.CloudProvider
+	}
+)
 
 func (i instance) AppName() string {
-	return i.appName
+	return string(i.appName)
 }
 
 func (i instance) AccountName() string {
-	return i.accountName
+	return string(i.accountName)
 }
 
 func (i instance) RegionName() string {
-	return i.regionName
+	return string(i.regionName)
 }
 
 func (i instance) StackName() string {
-	return i.stackName
+	return string(i.stackName)
 }
 
 func (i instance) ClusterName() string {
-	return i.clusterName
+	return string(i.clusterName)
 }
 
 func (i instance) ASGName() string {
-	return i.asgName
+	return string(i.asgName)
 }
 
 func (i instance) Name() string {
-	return i.clusterName
+	return string(i.clusterName)
 }
 
 func (i instance) ID() string {
-	return i.id
+	return string(i.id)
 }
 
 func (i instance) CloudProvider() string {
-	return i.cloudProvider
+	return string(i.cloudProvider)
 }
 
 
@@ -79,12 +90,19 @@ func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.De
 		return nil, nil
 	}
 
-	r, ok := group.Region()
-	if !ok {
+	r, specificRegion := group.Region()
+	if !specificRegion {
 		return nil, errors.New("only supports region-specific grouping")
 	}
 
+	cluster, specificCluster := group.Cluster()
+
 	region := deploy.RegionName(r)
+
+	switch {
+	case specificRegion && specificCluster:
+
+	}
 
 	switch cfg.Grouping {
 	case chaosmonkey.App:
