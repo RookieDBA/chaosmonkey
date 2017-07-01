@@ -74,7 +74,7 @@ func (d deployment) GetClusterNames(app string, account D.AccountName) ([]D.Clus
 	return result, nil
 }
 
-func (d deployment) GetRegionNames(app string, account D.AccountName, cloudProvider string, cluster D.ClusterName) ([]D.RegionName, error) {
+func (d deployment) GetRegionNames(app string, account D.AccountName, cluster D.ClusterName) ([]D.RegionName, error) {
 	result := make([]D.RegionName, 0)
 	for region := range d.apps[app][account].Clusters[cluster] {
 		result = append(result, region)
