@@ -149,10 +149,6 @@ func isWhitelist(err error) bool {
 
 // Instances returns instances eligible for termination
 func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
-	if !cfg.Enabled {
-		return nil, nil
-	}
-
 	if cfg.Whitelist != nil {
 		return nil, errors.New(whiteListErrorMessage)
 	}
