@@ -152,7 +152,7 @@ func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.De
 	result := make([]chaosmonkey.Instance, 0)
 
 	for _, cl := range cls {
-		instances, err := clusterRegionInstances(cl, dep)
+		instances, err := getInstances(cl, dep)
 		if err != nil {
 			return nil, err
 		}
@@ -164,7 +164,7 @@ func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.De
 
 }
 
-func clusterRegionInstances(cl cluster, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
+func getInstances(cl cluster, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
 	result := make([]chaosmonkey.Instance, 0)
 
 	asgName, ids, err := dep.GetInstanceIDs(string(cl.appName),cl.accountName, string(cl.cloudProvider), cl.regionName, cl.clusterName)
