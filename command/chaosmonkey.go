@@ -153,6 +153,10 @@ clusters <app> <account>
 ------------------------
 
 List the clusters for a given app and account
+
+Example:
+
+	chaosmonkey clusters chaosguineapig test
 `
 	fmt.Printf(usage)
 }
