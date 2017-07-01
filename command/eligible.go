@@ -21,7 +21,6 @@ import (
 	"github.com/Netflix/chaosmonkey"
 	"github.com/Netflix/chaosmonkey/deploy"
 	"github.com/Netflix/chaosmonkey/grp"
-	"github.com/Netflix/chaosmonkey/term"
 	"github.com/Netflix/chaosmonkey/eligible"
 )
 
