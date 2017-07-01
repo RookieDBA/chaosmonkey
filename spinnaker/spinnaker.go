@@ -457,12 +457,6 @@ func (s Spinnaker) CloudProvider(account string) (provider string, err error) {
 	return fields.CloudProvider, nil
 }
 
-type parsedClusters struct {
-	Clusters map[string][]struct {
-		Name string
-	}
-}
-
 // GetClusterNames returns a list of cluster names for an app
 func (s Spinnaker) GetClusterNames(app string, account D.AccountName) (clusters []D.ClusterName, err error) {
 	url := s.appURL(app)
@@ -486,10 +480,15 @@ func (s Spinnaker) GetClusterNames(app string, account D.AccountName) (clusters 
 		return nil, errors.Wrap(err, fmt.Sprintf("body read failed at %s", url))
 	}
 
-	var pcl parsedClusters
+	var pcl struct {
+		Clusters map[string][]struct {
+			Name string
+		}
+	}
+
 	err = json.Unmarshal(body, &pcl)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse json")
+		return nil, errors.Wrapf(err, "failed to parse json at %s", url)
 	}
 
 	cls := pcl.Clusters[string(account)]
