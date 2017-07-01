@@ -4,6 +4,8 @@ SHELL:=/bin/bash
 
 check: fmt lint errcheck
 
+gofmt: fmt
+
 fmt: 
 	diff -u <(echo -n) <(gofmt -d `find . -name '*.go' | grep -Ev '/vendor/|/migration'`)
 
