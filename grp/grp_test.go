@@ -181,13 +181,13 @@ func TestContains(t *testing.T) {
 		{grp.New("foo", "prod", "us-east-1", "", ""), "foo", "prod", "us-east-1", "staging", "foo-staging-a", true},
 		{grp.New("foo", "prod", "us-east-1", "", ""), "foo", "prod", "us-east-1", "staging", "foo-staging-a", true},
 		{grp.New("foo", "prod", "us-east-1", "", "foo-staging-a"), "foo", "prod", "us-east-1", "staging", "foo-staging-a", true},
-		{grp.New("foo", "prod", "", "", ""), "bar", "prod", "us-east-1", "staging", "foo-staging-a", false},
+		{grp.New("foo", "prod", "", "", ""), "bar", "prod", "us-east-1", "staging", "bar-staging-a", false},
 		{grp.New("foo", "prod", "", "", ""), "foo", "test", "us-east-1", "staging", "foo-staging-a", false},
 		{grp.New("foo", "prod", "us-east-1", "", "foo-staging-a"), "foo", "prod", "us-west-2", "staging", "foo-staging-a", false},
 	}
 
 	for _, tt := range tests {
-		if grp.Contains(tt.group, tt.app, tt.account, tt.region, tt.stack, tt.cluster) != tt.matches {
+		if grp.Kontains(tt.group, tt.account, tt.region, tt.cluster) != tt.matches {
 			t.Errorf("unexpected grp.Contains(app=%s, account=%s, region=%s, stack=%s, cluster=%s). group=%+v. expected %t",
 				tt.app, tt.account, tt.region, tt.stack, tt.cluster, tt.group, tt.matches)
 		}
