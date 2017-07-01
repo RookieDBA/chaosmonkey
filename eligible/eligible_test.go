@@ -1,10 +1,10 @@
 package eligible
 
 import (
-	"testing"
-	"github.com/Netflix/chaosmonkey/grp"
 	"github.com/Netflix/chaosmonkey"
+	"github.com/Netflix/chaosmonkey/grp"
 	"github.com/Netflix/chaosmonkey/mock"
+	"testing"
 )
 
 func TestClusterGropuing(t *testing.T) {

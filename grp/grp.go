@@ -238,7 +238,7 @@ func Kontains(g InstanceGroup, account, region, cluster string) bool {
 	}
 
 	return names.App == g.App() &&
-	string(account) == g.Account() &&
+		string(account) == g.Account() &&
 		(AnyRegion(g) || string(region) == must(g.Region())) &&
 		(AnyStack(g) || names.Stack == must(g.Stack())) &&
 		(AnyCluster(g) || string(cluster) == must(g.Cluster()))

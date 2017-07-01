@@ -25,8 +25,8 @@ import (
 	"github.com/Netflix/chaosmonkey"
 	"github.com/Netflix/chaosmonkey/deploy"
 	"github.com/Netflix/chaosmonkey/deps"
-	"github.com/Netflix/chaosmonkey/grp"
 	"github.com/Netflix/chaosmonkey/eligible"
+	"github.com/Netflix/chaosmonkey/grp"
 )
 
 type leashedKiller struct {

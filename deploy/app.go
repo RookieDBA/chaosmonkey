@@ -55,7 +55,6 @@ type (
 	// CloudProvider is the name of the cloud backend (e.g., aws)
 	CloudProvider string
 
-
 	// ClusterMap maps cluster name to information about instances by region and
 	// ASG
 	ClusterMap map[ClusterName]map[RegionName]map[ASGName][]InstanceID
@@ -69,7 +68,6 @@ type (
 	// AppMap is a map that tracks info about an app
 	AppMap map[AccountName]AccountInfo
 )
-
 
 // NewApp constructs a new App
 func NewApp(name string, data AppMap) *App {

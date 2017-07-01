@@ -2,31 +2,30 @@
 package eligible
 
 import (
-	"github.com/Netflix/chaosmonkey/grp"
 	"github.com/Netflix/chaosmonkey"
 	"github.com/Netflix/chaosmonkey/deploy"
-	"github.com/pkg/errors"
+	"github.com/Netflix/chaosmonkey/grp"
 	"github.com/SmartThingsOSS/frigga-go"
+	"github.com/pkg/errors"
 )
 
 type (
-
 	cluster struct {
-		appName deploy.AppName
-		accountName deploy.AccountName
+		appName       deploy.AppName
+		accountName   deploy.AccountName
 		cloudProvider deploy.CloudProvider
-		regionName deploy.RegionName
-		clusterName deploy.ClusterName
+		regionName    deploy.RegionName
+		clusterName   deploy.ClusterName
 	}
 
-	instance struct{
-		appName deploy.AppName
-		accountName deploy.AccountName
-		regionName deploy.RegionName
-		stackName deploy.StackName
-		clusterName deploy.ClusterName
-		asgName deploy.ASGName
-		id deploy.InstanceID
+	instance struct {
+		appName       deploy.AppName
+		accountName   deploy.AccountName
+		regionName    deploy.RegionName
+		stackName     deploy.StackName
+		clusterName   deploy.ClusterName
+		asgName       deploy.ASGName
+		id            deploy.InstanceID
 		cloudProvider deploy.CloudProvider
 	}
 )
@@ -67,7 +66,6 @@ func (i instance) CloudProvider() string {
 	return string(i.cloudProvider)
 }
 
-
 func isException(exs []chaosmonkey.Exception, account deploy.AccountName, names *frigga.Names, region deploy.RegionName) bool {
 	for _, ex := range exs {
 		if ex.Matches(string(account), names.Stack, names.Detail, string(region)) {
@@ -99,21 +97,21 @@ func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs [
 			return nil, err
 		}
 
-			for _, region := range regions {
+		for _, region := range regions {
 
-				if isException(exs, account, names, region) {
-					continue
-				}
-
-				if grp.Kontains(group, string(account), string(region), string(clusterName)) {
-					result = append(result, cluster{appName: deploy.AppName(names.App),
-						accountName:                         account,
-						cloudProvider:                       cloudProvider,
-						regionName:                          region,
-						clusterName:                         clusterName,
-					})
-				}
+			if isException(exs, account, names, region) {
+				continue
 			}
+
+			if grp.Kontains(group, string(account), string(region), string(clusterName)) {
+				result = append(result, cluster{appName: deploy.AppName(names.App),
+					accountName:   account,
+					cloudProvider: cloudProvider,
+					regionName:    region,
+					clusterName:   clusterName,
+				})
+			}
+		}
 	}
 
 	return result, nil
@@ -152,15 +150,14 @@ func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.De
 	}
 	return result, nil
 
-
 }
 
 func getInstances(cl cluster, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
 	result := make([]chaosmonkey.Instance, 0)
 
-	asgName, ids, err := dep.GetInstanceIDs(string(cl.appName),cl.accountName, string(cl.cloudProvider), cl.regionName, cl.clusterName)
+	asgName, ids, err := dep.GetInstanceIDs(string(cl.appName), cl.accountName, string(cl.cloudProvider), cl.regionName, cl.clusterName)
 
-	if err!=nil {
+	if err != nil {
 		return nil, err
 	}
 
@@ -171,16 +168,15 @@ func getInstances(cl cluster, dep deploy.Deployment) ([]chaosmonkey.Instance, er
 		}
 		result = append(result,
 			instance{appName: cl.appName,
-				accountName: cl.accountName,
-				regionName: cl.regionName,
-				stackName: deploy.StackName(names.Stack),
-				clusterName: cl.clusterName,
-				asgName: deploy.ASGName(asgName),
-				id: id,
+				accountName:   cl.accountName,
+				regionName:    cl.regionName,
+				stackName:     deploy.StackName(names.Stack),
+				clusterName:   cl.clusterName,
+				asgName:       deploy.ASGName(asgName),
+				id:            id,
 				cloudProvider: cl.cloudProvider,
 			})
 	}
 
 	return result, nil
 }
-

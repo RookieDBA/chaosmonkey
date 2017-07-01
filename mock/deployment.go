@@ -94,7 +94,6 @@ func (d deployment) CloudProvider(account string) (string, error) {
 	return cloudProvider, nil
 }
 
-
 func (d deployment) GetInstanceIDs(app string, account D.AccountName, cloudProvider string, region D.RegionName, cluster D.ClusterName) (D.ASGName, []D.InstanceID, error) {
 	// asgs associated with the cluster
 	asgs := d.apps[app][account].Clusters[cluster][region]
@@ -113,4 +112,3 @@ func (d deployment) GetInstanceIDs(app string, account D.AccountName, cloudProvi
 
 	return asg, instances, nil
 }
-
