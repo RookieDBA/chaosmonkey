@@ -7,7 +7,11 @@ import (
 	"github.com/Netflix/chaosmonkey/grp"
 	"github.com/SmartThingsOSS/frigga-go"
 	"github.com/pkg/errors"
+	"strings"
 )
+
+// TODO: make these a configuration parameter
+var neverEligibleSuffixes []string = []string{"-canary", "-baseline", "-citrus", "-citrusproxy"}
 
 type (
 	cluster struct {
@@ -76,6 +80,15 @@ func isException(exs []chaosmonkey.Exception, account deploy.AccountName, names 
 	return false
 }
 
+func isNeverEligible(cluster deploy.ClusterName) bool {
+	for _, suffix := range neverEligibleSuffixes {
+		if strings.HasSuffix(string(cluster), suffix) {
+			return true
+		}
+	}
+	return false
+}
+
 func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs []chaosmonkey.Exception, dep deploy.Deployment) ([]cluster, error) {
 	account := deploy.AccountName(group.Account())
 	clusterNames, err := dep.GetClusterNames(group.App(), account)
@@ -100,6 +113,10 @@ func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs [
 		for _, region := range regions {
 
 			if isException(exs, account, names, region) {
+				continue
+			}
+
+			if isNeverEligible(clusterName) {
 				continue
 			}
 
