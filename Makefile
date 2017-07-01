@@ -2,6 +2,9 @@
 
 SHELL:=/bin/bash
 
+build: check
+	go build github.com/Netflix/chaosmonkey/cmd/chaosmonkey
+
 check: fmt lint errcheck
 
 gofmt: fmt
@@ -17,9 +20,6 @@ errcheck:
 
 test:
 	go test -v  ./...
-
-build:
-	go build github.com/Netflix/chaosmonkey/cmd/chaosmonkey
 
 fix:
 	gofmt -w `find . -name '*.go' | grep -Ev '/vendor/|/migration'`
