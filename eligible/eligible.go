@@ -151,8 +151,8 @@ func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.De
 
 	result := make([]chaosmonkey.Instance, 0)
 
-	for _, cluster := range cls {
-		instances, err := clusterRegionInstances(cluster.clusterName, cluster.regionName, group, dep)
+	for _, cl := range cls {
+		instances, err := clusterRegionInstances(cl, dep)
 		if err != nil {
 			return nil, err
 		}
@@ -164,17 +164,10 @@ func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.De
 
 }
 
-func clusterRegionInstances(cluster deploy.ClusterName, region deploy.RegionName, group grp.InstanceGroup, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
-
-
+func clusterRegionInstances(cl cluster, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
 	result := make([]chaosmonkey.Instance, 0)
 
-	cloudProvider, err := dep.CloudProvider(group.Account())
-	if err != nil {
-		return nil, errors.Wrap(err, "retrieve cloud provider failed")
-	}
-
-	asgName, ids, err := dep.GetInstanceIDs(group.App(),deploy.AccountName(group.Account()), cloudProvider, region, deploy.ClusterName(cluster))
+	asgName, ids, err := dep.GetInstanceIDs(string(cl.appName),cl.accountName, string(cl.cloudProvider), cl.regionName, cl.clusterName)
 
 	if err!=nil {
 		return nil, err
@@ -186,14 +179,14 @@ func clusterRegionInstances(cluster deploy.ClusterName, region deploy.RegionName
 			return nil, errors.Wrap(err, "failed to parse")
 		}
 		result = append(result,
-			instance{appName: deploy.AppName(group.App()),
-				accountName: deploy.AccountName(group.Account()),
-				regionName: region,
+			instance{appName: cl.appName,
+				accountName: cl.accountName,
+				regionName: cl.regionName,
 				stackName: deploy.StackName(names.Stack),
-				clusterName: deploy.ClusterName(names.Cluster),
+				clusterName: cl.clusterName,
 				asgName: deploy.ASGName(asgName),
 				id: id,
-				cloudProvider: deploy.CloudProvider(cloudProvider),
+				cloudProvider: cl.cloudProvider,
 			})
 	}
 
