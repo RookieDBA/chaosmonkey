@@ -218,17 +218,6 @@ func AnyCluster(g InstanceGroup) bool {
 	return !specific
 }
 
-// Contains returns true if the asg/instance with
-// matching app, account, region, stack and cluster
-// are elements of this instance group
-func Contains(g InstanceGroup, app, account, region, stack, cluster string) bool {
-	return app == g.App() &&
-		account == g.Account() &&
-		(AnyRegion(g) || region == must(g.Region())) &&
-		(AnyStack(g) || stack == must(g.Stack())) &&
-		(AnyCluster(g) || cluster == must(g.Cluster()))
-}
-
 // Kontains retruns true if the (account, region, cluster) is within the instance group
 func Kontains(g InstanceGroup, account, region, cluster string) bool {
 	names, err := frigga.Parse(cluster)
