@@ -92,13 +92,6 @@ func isNeverEligible(cluster deploy.ClusterName) bool {
 func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs []chaosmonkey.Exception, dep deploy.Deployment) ([]cluster, error) {
 	account := deploy.AccountName(group.Account())
 	clusterNames, err := dep.GetClusterNames(group.App(), account)
-	regions := make([]deploy.RegionName, 0)
-	region, ok := group.Region()
-	if ok {
-		regions = append(regions, deploy.RegionName(region))
-	} else {
-		regions = append(regions, "us-east-1", "us-west-2", "eu-west-1")
-	}
 	if err != nil {
 		return nil, err
 	}
@@ -108,6 +101,19 @@ func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs [
 		names, err := frigga.Parse(string(clusterName))
 		if err != nil {
 			return nil, err
+		}
+
+		var regions []deploy.RegionName
+		region, ok := group.Region()
+		if ok {
+			// group is associated with a single region
+			regions = []deploy.RegionName{deploy.RegionName(region)}
+		} else {
+			// group is multi-region, we need to query the deployment to figure out which regions the cluster is in
+			regions, err = dep.GetRegionNames(names.App, account, string(cloudProvider), clusterName)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		for _, region := range regions {

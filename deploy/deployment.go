@@ -40,6 +40,9 @@ type Deployment interface {
 	// GetClusterNames returns the list of cluster names
 	GetClusterNames(app string, account AccountName) ([]ClusterName, error)
 
+	// GetRegionNames returns the list of regions associated with a cluster
+	GetRegionNames(app string, account AccountName, cloudProvider string, cluster ClusterName) ([]RegionName, error)
+
 	// CloudProvider returns the provider associated with an account
 	CloudProvider(account string) (provider string, err error)
 }

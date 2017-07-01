@@ -459,5 +459,11 @@ func (s Spinnaker) CloudProvider(account string) (provider string, err error) {
 
 // GetClusterNames returns a list of cluster names for an app
 func (s Spinnaker) GetClusterNames(app string, account D.AccountName) ([]D.ClusterName, error) {
-	return nil, errors.New("not yet impelmented")
+	return nil, errors.New("not yet implemented")
 }
+
+// GetRegionNames returns a list of regions that a cluster is deployed into
+func (s Spinnaker) GetRegionNames(app string, account D.AccountName, cloudProvider string, cluster D.ClusterName) ([]D.RegionName, error) {
+	return nil, errors.New("not yet implemented")
+}
+
