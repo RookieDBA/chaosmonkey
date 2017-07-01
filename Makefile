@@ -18,7 +18,5 @@ errcheck:
 test:
 	go test -v  ./...
 
-build: chaosmonkey
-
-chaosmonkey:
+build:
 	go build github.com/Netflix/chaosmonkey/cmd/chaosmonkey
