@@ -42,7 +42,7 @@ func mockASG() *D.ASG {
 
 func TestIsExceptionNoWildcards(t *testing.T) {
 	exs := []chaosmonkey.Exception{
-		chaosmonkey.Exception{Account: "prod", Stack: "mystack", Detail: "mydetail", Region: "us-east-1"},
+		{Account: "prod", Stack: "mystack", Detail: "mydetail", Region: "us-east-1"},
 	}
 
 	asg := mockASG()

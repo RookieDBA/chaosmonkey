@@ -22,6 +22,7 @@ import (
 	"github.com/Netflix/chaosmonkey/deploy"
 	"github.com/Netflix/chaosmonkey/grp"
 	"github.com/Netflix/chaosmonkey/term"
+	"github.com/Netflix/chaosmonkey/eligible"
 )
 
 // Eligible prints out a list of instance ids eligible for termination
@@ -34,12 +35,13 @@ func Eligible(g chaosmonkey.AppConfigGetter, d deploy.Deployment, app, account, 
 	}
 
 	group := grp.New(app, account, region, stack, cluster)
-	pApp, err := d.GetApp(app)
+	instances, err := eligible.Instances(group, *cfg, d)
 	if err != nil {
-		fmt.Printf("GetApp failed for app %s\n%+v", app, err)
+		fmt.Print(err)
 		os.Exit(1)
 	}
-	for _, instance := range term.EligibleInstances(group, *cfg, pApp) {
+
+	for _, instance := range instances {
 		fmt.Println(instance.ID())
 	}
 }
