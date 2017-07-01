@@ -218,8 +218,8 @@ func AnyCluster(g InstanceGroup) bool {
 	return !specific
 }
 
-// Kontains retruns true if the (account, region, cluster) is within the instance group
-func Kontains(g InstanceGroup, account, region, cluster string) bool {
+// Contains returns true if the (account, region, cluster) is within the instance group
+func Contains(g InstanceGroup, account, region, cluster string) bool {
 	names, err := frigga.Parse(cluster)
 	if err != nil {
 		log.Printf("WARNING: could not parse cluster name: %s", cluster)

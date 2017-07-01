@@ -173,9 +173,9 @@ func TestNewClusterCrossRegion(t *testing.T) {
 
 func TestContains(t *testing.T) {
 	tests := []struct {
-		group                                grp.InstanceGroup
+		group                    grp.InstanceGroup
 		account, region, cluster string
-		matches                              bool
+		matches                  bool
 	}{
 		{grp.New("foo", "prod", "", "", ""), "prod", "us-east-1", "foo-staging-a", true},
 		{grp.New("foo", "prod", "us-east-1", "", ""), "prod", "us-east-1", "foo-staging-a", true},
@@ -187,7 +187,7 @@ func TestContains(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if grp.Kontains(tt.group, tt.account, tt.region, tt.cluster) != tt.matches {
+		if grp.Contains(tt.group, tt.account, tt.region, tt.cluster) != tt.matches {
 			t.Errorf("unexpected grp.Contains(account=%s, region=%s, cluster=%s). group=%+v. expected %t",
 				tt.account, tt.region, tt.cluster, tt.group, tt.matches)
 		}

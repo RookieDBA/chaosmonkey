@@ -11,7 +11,7 @@ import (
 )
 
 // TODO: make these a configuration parameter
-var neverEligibleSuffixes []string = []string{"-canary", "-baseline", "-citrus", "-citrusproxy"}
+var neverEligibleSuffixes = []string{"-canary", "-baseline", "-citrus", "-citrusproxy"}
 
 type (
 	cluster struct {
@@ -126,7 +126,7 @@ func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs [
 				continue
 			}
 
-			if grp.Kontains(group, string(account), string(region), string(clusterName)) {
+			if grp.Contains(group, string(account), string(region), string(clusterName)) {
 				result = append(result, cluster{appName: deploy.AppName(names.App),
 					accountName:   account,
 					cloudProvider: cloudProvider,
