@@ -457,12 +457,10 @@ func (s Spinnaker) CloudProvider(account string) (provider string, err error) {
 	return fields.CloudProvider, nil
 }
 
-type parsedNamedCluster struct {
-	Name string
-}
-
 type parsedClusters struct {
-	Clusters map[string][]parsedNamedCluster
+	Clusters map[string][]struct {
+		Name string
+	}
 }
 
 // GetClusterNames returns a list of cluster names for an app
