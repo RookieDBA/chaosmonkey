@@ -225,7 +225,46 @@ func (s Spinnaker) Apps(c chan<- *D.App, appNames []string) {
 
 // GetInstanceIDs gets the instance ids for a cluster
 func (s Spinnaker) GetInstanceIDs(app string, account D.AccountName, cloudProvider string, region D.RegionName, cluster D.ClusterName) (D.ASGName, []D.InstanceID, error) {
-	return "", nil, errors.New("not yet implemented")
+	url := s.activeASGURL(app, string(account), string(cluster), cloudProvider, string(region))
+
+	resp, err := s.client.Get(url)
+	if err != nil {
+		return "", nil, errors.Wrapf(err, "http get failed at %s", url)
+	}
+
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil && err == nil {
+			err = errors.Wrapf(err, "body close failed at %s", url)
+		}
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", nil, errors.Errorf("unexpected response code (%d) from %s", resp.StatusCode, url)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", nil, errors.Wrap(err, fmt.Sprintf("body read failed at %s", url))
+	}
+
+	var data struct{
+		Name string
+		Instances []struct{ Name string }
+	}
+
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return "", nil, errors.Wrapf(err, "failed to parse json at %s", url)
+	}
+
+	asg := D.ASGName(data.Name)
+	instances := make([]D.InstanceID, len(data.Instances))
+	for i, instance := range data.Instances {
+		instances[i] = D.InstanceID(instance)
+	}
+
+	return asg, instances, nil
+
 }
 
 // GetApp implements deploy.Deployment.GetApp

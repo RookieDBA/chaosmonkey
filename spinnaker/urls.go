@@ -50,3 +50,9 @@ func (s Spinnaker) accountURL(account string) string {
 func (s Spinnaker) instanceURL(account string, region string, id string) string {
 	return fmt.Sprintf("%s/instances/%s/%s/%s", s.endpoint, account, region, id)
 }
+
+// activeASGURL returns the spinnaker URL for getting the active asg in a cluster
+func (s Spinnaker) activeASGURL(appName, account, clusterName, cloudProvider, region string) string {
+	return fmt.Sprintf("%s/applications/%s/clusters/%s/%s/%s/%s/serverGroups/target/CURRENT?onlyEnabled=true",
+		s.endpoint, appName, account, clusterName, cloudProvider, region)
+}
