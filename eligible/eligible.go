@@ -200,27 +200,3 @@ func clusterRegionInstances(cluster deploy.ClusterName, region deploy.RegionName
 	return result, nil
 }
 
-func appRegionInstances(app string, exs []chaosmonkey.Exception, region deploy.RegionName, group grp.InstanceGroup, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
-	account := deploy.AccountName(group.Account())
-	clusters, err := dep.GetClusterNames(app, account)
-	if err != nil {
-		return nil, err
-	}
-
-	result := make([]chaosmonkey.Instance, 0)
-	for _, cluster := range clusters {
-
-		if isException(exs, account, cluster, region) {
-			continue
-		}
-
-		instances, err := clusterRegionInstances(cluster, region, group, dep)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, instances...)
-	}
-
-	return result, nil
-
-}
