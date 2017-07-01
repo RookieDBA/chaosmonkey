@@ -466,4 +466,3 @@ func (s Spinnaker) GetClusterNames(app string, account D.AccountName) ([]D.Clust
 func (s Spinnaker) GetRegionNames(app string, account D.AccountName, cloudProvider string, cluster D.ClusterName) ([]D.RegionName, error) {
 	return nil, errors.New("not yet implemented")
 }
-
