@@ -157,6 +157,16 @@ List the clusters for a given app and account
 Example:
 
 	chaosmonkey clusters chaosguineapig test
+
+
+regions <cluster> <account>
+---------------------------
+
+List the regions for a given cluster and account
+
+Example:
+
+	chaosmonkey regions chaosguineapig test
 `
 	fmt.Printf(usage)
 }
@@ -365,6 +375,18 @@ func Execute() {
 		for _, cluster := range clusters {
 			fmt.Println(cluster)
 		}
+
+	case "regions":
+		if len(flag.Args()) != 3 {
+			flag.Usage()
+			os.Exit(1)
+		}
+
+		cluster := flag.Arg(1)
+		account := flag.Arg(2)
+
+		DumpRegions(cluster, account, spin)
+
 
 	default:
 		flag.Usage()
