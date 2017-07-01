@@ -525,7 +525,7 @@ func (s Spinnaker) GetRegionNames(app string, account D.AccountName, cluster D.C
 	}
 
 	var cl struct {
-		ServerGroups []struct{Region string}
+		ServerGroups []struct{ Region string }
 	}
 
 	err = json.Unmarshal(body, &cl)

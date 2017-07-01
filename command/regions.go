@@ -1,11 +1,11 @@
 package command
 
 import (
+	"fmt"
+	"github.com/Netflix/chaosmonkey/deploy"
 	"github.com/Netflix/chaosmonkey/spinnaker"
 	"github.com/SmartThingsOSS/frigga-go"
-	"fmt"
 	"os"
-	"github.com/Netflix/chaosmonkey/deploy"
 )
 
 // DumpRegions lists the regions that a cluster is in

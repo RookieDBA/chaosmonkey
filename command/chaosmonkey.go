@@ -387,7 +387,6 @@ func Execute() {
 
 		DumpRegions(cluster, account, spin)
 
-
 	default:
 		flag.Usage()
 		os.Exit(1)
