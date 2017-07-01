@@ -458,8 +458,65 @@ func (s Spinnaker) CloudProvider(account string) (provider string, err error) {
 }
 
 // GetClusterNames returns a list of cluster names for an app
-func (s Spinnaker) GetClusterNames(app string, account D.AccountName) ([]D.ClusterName, error) {
-	return nil, errors.New("not yet implemented")
+func (s Spinnaker) GetClusterNames(app string, account D.AccountName) (clusters []D.ClusterName, err error) {
+	url := s.appURL(app)
+	resp, err := s.client.Get(url)
+	if err != nil {
+		return nil, errors.Wrapf(err, "http get failed at %s", url)
+	}
+
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil && err == nil {
+			err = errors.Wrapf(err, "body close failed at %s", url)
+		}
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("unexpected response code (%d) from %s", resp.StatusCode, url)
+	}
+
+
+	dec := json.NewDecoder(resp.Body)
+
+	var f interface{}
+	err = dec.Decode(&f)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to json parse response")
+	}
+
+	top, ok := f.(map[string]interface{})
+	if !ok {
+		return nil, errors.New("returned json is not an object")
+	}
+
+	cls, ok := top["clusters"].(map[string]interface{})
+	if !ok {
+		return nil, errors.New("returned json does not have a 'clusters' entry")
+	}
+
+	clist, ok := cls[string(account)].([](interface{}))
+	if !ok {
+		return nil, errors.Errorf("no list of clusters with account %s", account)
+	}
+
+	clusters = make([]D.ClusterName, len(clist))
+
+
+	for i, c := range clist {
+		cc, ok := c.(map[string]interface{})
+		if !ok {
+			return nil, errors.New("expected cluster object")
+		}
+
+		cname, ok := cc["name"].(string)
+		if !ok {
+			return nil, errors.New("could not parse cluster name")
+		}
+
+		clusters[i] = D.ClusterName(cname)
+	}
+
+	return clusters, nil
 }
 
 // GetRegionNames returns a list of regions that a cluster is deployed into
