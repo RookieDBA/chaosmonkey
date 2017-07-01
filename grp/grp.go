@@ -19,6 +19,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/SmartThingsOSS/frigga-go"
+	"log"
 )
 
 // New generates an InstanceGroup.
@@ -225,6 +227,20 @@ func Contains(g InstanceGroup, app, account, region, stack, cluster string) bool
 		(AnyRegion(g) || region == must(g.Region())) &&
 		(AnyStack(g) || stack == must(g.Stack())) &&
 		(AnyCluster(g) || cluster == must(g.Cluster()))
+}
+
+func Kontains(g InstanceGroup, account, region, cluster string) bool {
+	names, err := frigga.Parse((string(cluster)))
+	if err != nil {
+		log.Printf("WARNING: could not parse cluster name: %s", cluster)
+		return false
+	}
+
+	return names.App == g.App() &&
+	string(account) == g.Account() &&
+		(AnyRegion(g) || string(region) == must(g.Region())) &&
+		(AnyStack(g) || names.Stack == must(g.Stack())) &&
+		(AnyCluster(g) || string(cluster) == must(g.Cluster()))
 }
 
 // must returns val if ok is true
