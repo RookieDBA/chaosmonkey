@@ -115,7 +115,13 @@ func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs [
 	}
 
 	return result, nil
+}
 
+const whiteListErrorMessage = "whitelist is not supported"
+
+// isWhiteList returns true if an error is related to a whitelist
+func isWhitelist(err error) bool {
+	return err.Error() == whiteListErrorMessage
 }
 
 // Instances returns instances eligible for termination
@@ -125,7 +131,7 @@ func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.De
 	}
 
 	if cfg.Whitelist != nil {
-		return nil, errors.New("whitelist is not supported")
+		return nil, errors.New(whiteListErrorMessage)
 	}
 
 	cloudProvider, err := dep.CloudProvider(group.Account())

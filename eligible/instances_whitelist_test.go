@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package term
+package eligible
 
 import (
 	"io/ioutil"
@@ -21,46 +21,45 @@ import (
 
 	"github.com/Netflix/chaosmonkey"
 	"github.com/Netflix/chaosmonkey/grp"
+	"github.com/Netflix/chaosmonkey/mock"
 )
 
 // Test the whitelist logic
 // uses the mockApp function defined in eligible_instances_test.go
-
+// Since whitelist is no longer supported, this just verifies that an error is thrown
 func TestWhitelist(t *testing.T) {
 	log.SetOutput(ioutil.Discard)
 
 	cfg := testConfig(chaosmonkey.Cluster)
-	app := mockApp()
+	dep := mock.Deployment()
 	group := grp.New("mock", "prod", "", "", "")
 
 	var tests = []struct {
 		whitelist *[]chaosmonkey.Exception
 		count     int
 	}{
-		{nil, 8},                        // no whitelist
 		{&[]chaosmonkey.Exception{}, 0}, // empty whitelist
-		{&[]chaosmonkey.Exception{chaosmonkey.Exception{Account: "prod", Region: "us-east-1", Stack: "*", Detail: "*"}}, 4},
-		{&[]chaosmonkey.Exception{chaosmonkey.Exception{Account: "prod", Region: "us-east-1", Stack: "prod", Detail: "*"}}, 2},
-		{&[]chaosmonkey.Exception{chaosmonkey.Exception{Account: "prod", Region: "us-east-1", Stack: "prod", Detail: "b"}}, 1},
+		{&[]chaosmonkey.Exception{{Account: "prod", Region: "us-east-1", Stack: "*", Detail: "*"}}, 4},
+		{&[]chaosmonkey.Exception{{Account: "prod", Region: "us-east-1", Stack: "prod", Detail: "*"}}, 2},
+		{&[]chaosmonkey.Exception{{Account: "prod", Region: "us-east-1", Stack: "prod", Detail: "b"}}, 1},
 
 		{&[]chaosmonkey.Exception{
-			chaosmonkey.Exception{Account: "prod", Region: "us-east-1", Stack: "prod", Detail: "b"},
-			chaosmonkey.Exception{Account: "prod", Region: "us-west-2", Stack: "staging", Detail: "*"},
+			{Account: "prod", Region: "us-east-1", Stack: "prod", Detail: "b"},
+			{Account: "prod", Region: "us-west-2", Stack: "staging", Detail: "*"},
 		}, 3},
 
 		{&[]chaosmonkey.Exception{
-			chaosmonkey.Exception{Account: "prod", Region: "us-east-1", Stack: "doesnotexist", Detail: "*"},
-			chaosmonkey.Exception{Account: "prod", Region: "us-east-1", Stack: "prod", Detail: "b"},
+			{Account: "prod", Region: "us-east-1", Stack: "doesnotexist", Detail: "*"},
+			{Account: "prod", Region: "us-east-1", Stack: "prod", Detail: "b"},
 		}, 1},
-		{&[]chaosmonkey.Exception{chaosmonkey.Exception{Account: "*", Region: "*", Stack: "doesnotexist", Detail: "*"}}, 0},
+		{&[]chaosmonkey.Exception{{Account: "*", Region: "*", Stack: "doesnotexist", Detail: "*"}}, 0},
 	}
 
 	for _, tt := range tests {
 		cfg.Whitelist = tt.whitelist
-		instances := EligibleInstances(group, cfg, app)
-		got, want := len(instances), tt.count
-		if got != want {
-			t.Fatalf("len(eligibleInstances(group, cfg, app))=%v, want %v", got, want)
+		_, err := Instances(group, cfg, dep)
+		if !isWhitelist(err) {
+			t.Fatal("expected whiteliste error")
 		}
 	}
 }
