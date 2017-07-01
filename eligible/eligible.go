@@ -105,23 +105,24 @@ func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs [
 			return nil, err
 		}
 
-		for _, region := range regions {
+		outer:
+			for _, region := range regions {
 
-			for _, ex := range exs {
-				if ex.Matches(string(account), names.Stack, names.Detail, string(region)) {
-					continue
+				for _, ex := range exs {
+					if ex.Matches(string(account), names.Stack, names.Detail, string(region)) {
+						continue outer
+					}
+				}
+
+				if grp.Kontains(group, string(account), string(region), string(clusterName)) {
+					result = append(result, cluster{appName: deploy.AppName(names.App),
+						accountName:                         account,
+						cloudProvider:                       cloudProvider,
+						regionName:                          region,
+						clusterName:                         clusterName,
+					})
 				}
 			}
-
-			if grp.Kontains(group, string(account), string(region), string(clusterName)) {
-				result = append(result, cluster{appName: deploy.AppName(names.App),
-					accountName:                         account,
-					cloudProvider:                       cloudProvider,
-					regionName:                          region,
-					clusterName:                         clusterName,
-				})
-			}
-		}
 	}
 
 	return result, nil
