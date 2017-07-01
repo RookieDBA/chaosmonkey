@@ -457,6 +457,7 @@ func (s Spinnaker) CloudProvider(account string) (provider string, err error) {
 	return fields.CloudProvider, nil
 }
 
+// GetClusterNames returns a list of cluster names for an app
 func (s Spinnaker) GetClusterNames(app string, account D.AccountName) ([]D.ClusterName, error) {
 	return nil, errors.New("not yet impelmented")
 }

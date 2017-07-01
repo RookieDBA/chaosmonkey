@@ -31,7 +31,7 @@ func (a App) Accounts() []*Account {
 }
 
 type (
-	// AppNAme is the name of an app
+	// AppName is the name of an app
 	AppName string
 
 	// AccountName is the name of a cloud account
