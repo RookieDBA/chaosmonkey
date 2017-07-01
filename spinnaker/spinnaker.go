@@ -502,6 +502,46 @@ func (s Spinnaker) GetClusterNames(app string, account D.AccountName) (clusters 
 }
 
 // GetRegionNames returns a list of regions that a cluster is deployed into
-func (s Spinnaker) GetRegionNames(app string, account D.AccountName, cloudProvider string, cluster D.ClusterName) ([]D.RegionName, error) {
-	return nil, errors.New("not yet implemented")
+func (s Spinnaker) GetRegionNames(app string, account D.AccountName, cluster D.ClusterName) ([]D.RegionName, error) {
+	url := s.clusterURL(app, string(account), string(cluster))
+	resp, err := s.client.Get(url)
+	if err != nil {
+		return nil, errors.Wrapf(err, "http get failed at %s", url)
+	}
+
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil && err == nil {
+			err = errors.Wrapf(err, "body close failed at %s", url)
+		}
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("unexpected response code (%d) from %s", resp.StatusCode, url)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("body read failed at %s", url))
+	}
+
+	var cl struct {
+		ServerGroups []struct{Region string}
+	}
+
+	err = json.Unmarshal(body, &cl)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to parse json at %s", url)
+	}
+
+	set := make(map[string]bool)
+	for _, g := range cl.ServerGroups {
+		set[g.Region] = true
+	}
+
+	result := make([]D.RegionName, 0, len(set))
+	for region := range set {
+		result = append(result, D.RegionName(region))
+	}
+
+	return result, nil
 }

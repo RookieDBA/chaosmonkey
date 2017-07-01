@@ -31,6 +31,11 @@ func (s Spinnaker) clustersURL(appName string) string {
 	return fmt.Sprintf("%s/applications/%s/clusters", s.endpoint, appName)
 }
 
+// clusterUrl returns the Spinnaker endpoint for retrieving info about a cluster
+func (s Spinnaker) clusterURL(appName string, account string, clusterName string) string {
+	return fmt.Sprintf("%s/applications/%s/clusters/%s/%s", s.endpoint, appName, account, clusterName)
+}
+
 // serverGroupsUrl returns the Spinnaker endpoint for retrieving server groups
 func (s Spinnaker) serverGroupsURL(appName, account, clusterName string) string {
 	return fmt.Sprintf("%s/applications/%s/clusters/%s/%s/serverGroups", s.endpoint, appName, account, clusterName)

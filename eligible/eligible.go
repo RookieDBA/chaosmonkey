@@ -110,7 +110,7 @@ func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs [
 			regions = []deploy.RegionName{deploy.RegionName(region)}
 		} else {
 			// group is multi-region, we need to query the deployment to figure out which regions the cluster is in
-			regions, err = dep.GetRegionNames(names.App, account, string(cloudProvider), clusterName)
+			regions, err = dep.GetRegionNames(names.App, account, clusterName)
 			if err != nil {
 				return nil, err
 			}

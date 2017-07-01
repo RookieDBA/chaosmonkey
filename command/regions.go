@@ -17,14 +17,7 @@ func DumpRegions(cluster, account string, spin spinnaker.Spinnaker) {
 		os.Exit(1)
 	}
 
-	provider, err := spin.CloudProvider(account)
-	if err != nil {
-		fmt.Printf("ERROR: Could not retrieve provider for account: %s. Reason: %v\n", account, err)
-		os.Exit(1)
-	}
-
-
-	regions, err := spin.GetRegionNames(names.App, deploy.AccountName(account), provider, deploy.ClusterName(cluster))
+	regions, err := spin.GetRegionNames(names.App, deploy.AccountName(account), deploy.ClusterName(cluster))
 	if err != nil {
 		fmt.Printf("ERROR: %v", err)
 		os.Exit(1)
