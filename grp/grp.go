@@ -204,13 +204,13 @@ func AnyRegion(g InstanceGroup) bool {
 	return !specific
 }
 
-// AnyStack is true if the group matches any region
+// AnyStack is true if the group matches any stack
 func AnyStack(g InstanceGroup) bool {
 	_, specific := g.Stack()
 	return !specific
 }
 
-// AnyCluster is true if the group matches any region
+// AnyCluster is true if the group matches any cluster
 func AnyCluster(g InstanceGroup) bool {
 	_, specific := g.Cluster()
 	return !specific
