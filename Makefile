@@ -1,4 +1,4 @@
-.PHONY: check fmt lint
+.PHONY: check fmt lint errcheck test build
 
 SHELL:=/bin/bash
 
@@ -18,4 +18,7 @@ errcheck:
 test:
 	go test -v  ./...
 
+build: chaosmonkey
 
+chaosmonkey:
+	go build github.com/Netflix/chaosmonkey/cmd/chaosmonkey
