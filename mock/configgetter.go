@@ -17,18 +17,28 @@ package mock
 import "github.com/Netflix/chaosmonkey"
 
 // ConfigGetter implements chaosmonkey.Getter
-type ConfigGetter struct{}
+type ConfigGetter struct{
+	Config chaosmonkey.AppConfig
+}
 
-// Get implements chaosmonkey.Getter.Get
-func (c ConfigGetter) Get(app string) (*chaosmonkey.AppConfig, error) {
-	cnf := chaosmonkey.AppConfig{
+func NewConfigGetter(config chaosmonkey.AppConfig) ConfigGetter {
+	return ConfigGetter{Config: config}
+}
+
+func DefaultConfigGetter() ConfigGetter {
+	return ConfigGetter{
+		Config: chaosmonkey.AppConfig{
 		Enabled:                        true,
 		RegionsAreIndependent:          true,
 		MeanTimeBetweenKillsInWorkDays: 5,
 		MinTimeBetweenKillsInWorkDays:  1,
 		Grouping:                       chaosmonkey.Cluster,
 		Exceptions:                     nil,
+		},
 	}
+}
 
-	return &cnf, nil
+// Get implements chaosmonkey.Getter.Get
+func (c ConfigGetter) Get(app string) (*chaosmonkey.AppConfig, error) {
+	return &c.Config, nil
 }
