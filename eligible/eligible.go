@@ -7,7 +7,6 @@ import (
 	"github.com/Netflix/chaosmonkey/deploy"
 	"github.com/pkg/errors"
 	"github.com/SmartThingsOSS/frigga-go"
-	"log"
 )
 
 type (
@@ -69,18 +68,13 @@ func (i instance) CloudProvider() string {
 }
 
 
-func isException(exs []chaosmonkey.Exception, account deploy.AccountName, cluster deploy.ClusterName, region deploy.RegionName) bool {
-	names, err := frigga.Parse(string(cluster))
-	if err != nil {
-		log.Printf("ERROR Couldn't parse cluster name %s", cluster)
-		return false
-	}
-
+func isException(exs []chaosmonkey.Exception, account deploy.AccountName, names *frigga.Names, region deploy.RegionName) bool {
 	for _, ex := range exs {
 		if ex.Matches(string(account), names.Stack, names.Detail, string(region)) {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -105,13 +99,10 @@ func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs [
 			return nil, err
 		}
 
-		outer:
 			for _, region := range regions {
 
-				for _, ex := range exs {
-					if ex.Matches(string(account), names.Stack, names.Detail, string(region)) {
-						continue outer
-					}
+				if isException(exs, account, names, region) {
+					continue
 				}
 
 				if grp.Kontains(group, string(account), string(region), string(clusterName)) {
