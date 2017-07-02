@@ -23,7 +23,10 @@ func mockDeployment() D.Deployment {
 				r1: {"foo-prod-v001": []D.InstanceID{"i-11111111", "i-22222222"}},
 				r2: {"foo-prod-v001": []D.InstanceID{"i-aaaaaaaa", "i-bbbbbbbb"}}},
 			"foo-prod-lorin": {r1: {"foo-prod-lorin-v123": []D.InstanceID{"i-33333333", "i-44444444"}}},
-			"foo-staging": {r1: {"foo-staging-v005": []D.InstanceID{"i-55555555", "i-66666666"}}},
+			"foo-staging": {
+				r1: {"foo-staging-v005": []D.InstanceID{"i-55555555", "i-66666666"}},
+				r2: {"foo-staging-v005": []D.InstanceID{"i-cccccccc", "i-dddddddd"}},
+			},
 			"foo-staging-lorin": {r1: {"foo-prod-lorin-v117": []D.InstanceID{"i-77777777", "i-88888888"}}},
 		}},
 		}}}
@@ -156,6 +159,8 @@ func TestGroupings(t *testing.T) {
 		{"stack", grp.New("foo", "prod", "us-east-1", "staging", ""), []string{"i-55555555", "i-66666666", "i-77777777", "i-88888888"}},
 		{"app", grp.New("foo", "prod", "us-east-1", "", ""), []string{"i-11111111", "i-22222222", "i-33333333", "i-44444444", "i-55555555", "i-66666666", "i-77777777", "i-88888888"}},
 		{"cluster, all regions", grp.New("foo", "prod", "", "", "foo-prod"),[]string{"i-11111111", "i-22222222", "i-aaaaaaaa", "i-bbbbbbbb"}},
+		{"stack, all regions", grp.New("foo", "prod", "", "staging", ""), []string{"i-55555555", "i-66666666", "i-77777777", "i-88888888", "i-cccccccc", "i-dddddddd"}},
+		{"app, all regions", grp.New("foo", "prod", "", "", ""), []string{"i-11111111", "i-22222222", "i-33333333", "i-44444444", "i-55555555", "i-66666666", "i-77777777", "i-88888888", "i-aaaaaaaa", "i-bbbbbbbb", "i-cccccccc", "i-dddddddd"}},
 	}
 
 
@@ -172,12 +177,14 @@ func TestGroupings(t *testing.T) {
 		gots := ids(instances)
 
 		if got, want := len(gots), len(tt.wants); got != want {
-			t.Fatalf("%s: len(eligible.Instances(group, cfg, app))=%v, want %v", tt.label, got, want)
+			t.Errorf("%s: len(eligible.Instances(group, cfg, app))=%v, want %v", tt.label, got, want)
+			continue
 		}
 
 		for i, got := range gots {
 			if want := tt.wants[i]; got != want {
-				t.Fatalf("%s: got=%v, want=%v", tt.label, got, want)
+				t.Errorf("%s: got=%v, want=%v", tt.label, got, want)
+				break
 			}
 		}
 	}
