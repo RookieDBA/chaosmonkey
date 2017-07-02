@@ -131,7 +131,6 @@ func doTerminate(d deps.Deps, group grp.InstanceGroup) error {
 		return nil
 	}
 
-
 	if appCfg.Whitelist != nil {
 		log.Printf("not terminating: app=%s has a whitelist which is no longer supported", appName)
 		return nil

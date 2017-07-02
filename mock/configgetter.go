@@ -17,7 +17,7 @@ package mock
 import "github.com/Netflix/chaosmonkey"
 
 // ConfigGetter implements chaosmonkey.Getter
-type ConfigGetter struct{
+type ConfigGetter struct {
 	Config chaosmonkey.AppConfig
 }
 
@@ -28,12 +28,12 @@ func NewConfigGetter(config chaosmonkey.AppConfig) ConfigGetter {
 func DefaultConfigGetter() ConfigGetter {
 	return ConfigGetter{
 		Config: chaosmonkey.AppConfig{
-		Enabled:                        true,
-		RegionsAreIndependent:          true,
-		MeanTimeBetweenKillsInWorkDays: 5,
-		MinTimeBetweenKillsInWorkDays:  1,
-		Grouping:                       chaosmonkey.Cluster,
-		Exceptions:                     nil,
+			Enabled:                        true,
+			RegionsAreIndependent:          true,
+			MeanTimeBetweenKillsInWorkDays: 5,
+			MinTimeBetweenKillsInWorkDays:  1,
+			Grouping:                       chaosmonkey.Cluster,
+			Exceptions:                     nil,
 		},
 	}
 }
