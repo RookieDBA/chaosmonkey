@@ -21,5 +21,12 @@ errcheck:
 test:
 	go test -v  ./...
 
+
+# Coverage testing
+cover:
+	echo 'mode: atomic' > coverage.out 
+	go list ./... | grep -Ev '/vendor/|/migration' | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.out' && rm coverage.tmp
+	go tool cover -html=coverage.out
+
 fix:
 	gofmt -w `find . -name '*.go' | grep -Ev '/vendor/|/migration'`
