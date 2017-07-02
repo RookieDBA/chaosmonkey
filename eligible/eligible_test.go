@@ -12,19 +12,35 @@ import (
 func mockDeployment() D.Deployment {
 	a := D.AccountName("prod")
 	p := "aws"
-	r := D.RegionName("us-east-1")
+	r1 := D.RegionName("us-east-1")
+	r2 := D.RegionName("us-west-2")
 
 	return &mock.Deployment{AppMap: map[string]D.AppMap{
 		"foo": {a:
 		D.AccountInfo{CloudProvider: p, Clusters:
 		D.ClusterMap{
-			"foo-prod": {r: {"foo-prod-v001": []D.InstanceID{"i-11111111", "i-22222222"}}},
-			"foo-prod-lorin": {r: {"foo-prod-lorin-v123": []D.InstanceID{"i-33333333", "i-44444444"}}},
-			"foo-staging": {r: {"foo-staging-v005": []D.InstanceID{"i-55555555", "i-66666666"}}},
-			"foo-staging-lorin": {r: {"foo-prod-lorin-v117": []D.InstanceID{"i-77777777", "i-88888888"}}},
+			"foo-prod": {
+				r1: {"foo-prod-v001": []D.InstanceID{"i-11111111", "i-22222222"}},
+				r2: {"foo-prod-v001": []D.InstanceID{"i-aaaaaaaa", "i-bbbbbbbb"}}},
+			"foo-prod-lorin": {r1: {"foo-prod-lorin-v123": []D.InstanceID{"i-33333333", "i-44444444"}}},
+			"foo-staging": {r1: {"foo-staging-v005": []D.InstanceID{"i-55555555", "i-66666666"}}},
+			"foo-staging-lorin": {r1: {"foo-prod-lorin-v117": []D.InstanceID{"i-77777777", "i-88888888"}}},
 		}},
 		}}}
 }
+
+// ids returns a sorted list of instance ids
+func ids(instances []chaosmonkey.Instance) []string {
+	result := make([]string, len(instances))
+	for i, inst := range instances {
+		result[i] = inst.ID()
+	}
+
+	sort.Strings(result)
+	return result
+
+}
+
 
 func TestClusterGropuing(t *testing.T) {
 	// setup
@@ -78,18 +94,6 @@ func TestStackGrouping(t *testing.T) {
 	}
 }
 
-// ids returns a sorted list of instance ids
-func ids(instances []chaosmonkey.Instance) []string {
-	result := make([]string, len(instances))
-	for i, inst := range instances {
-		result[i] = inst.ID()
-	}
-
-	sort.Strings(result)
-	return result
-
-}
-
 func TestAppGrouping(t *testing.T) {
 	// setup
 	dep := mockDeployment()
@@ -114,6 +118,67 @@ func TestAppGrouping(t *testing.T) {
 			t.Fatalf("got=%v, want=%v", got, want)
 		}
 	}
-
 }
 
+func TestCrossRegionClusterGrouping(t *testing.T) {
+	// setup
+	dep := mockDeployment()
+	group := grp.New("foo", "prod", "", "", "foo-prod")
+
+	// code under test
+	instances, err := Instances(group, nil, dep)
+	if err != nil {
+		t.Fatalf("%+v", err)
+	}
+
+	// assertions
+	gots := ids(instances)
+	wants := []string{"i-11111111", "i-22222222", "i-aaaaaaaa", "i-bbbbbbbb"}
+
+	if got, want := len(gots), len(wants); got != want {
+		t.Fatalf("len(eligible.Instances(group, cfg, app))=%v, want %v", got, want)
+	}
+
+	for i, got := range gots {
+		if want := wants[i]; got != want {
+			t.Fatalf("got=%v, want=%v", got, want)
+		}
+	}
+}
+
+func TestGroupings(t *testing.T) {
+	tests := []struct{
+		label string
+		group grp.InstanceGroup
+		wants []string
+	}{
+		{"cluster", grp.New("foo", "prod", "us-east-1", "", "foo-prod"), []string{"i-11111111", "i-22222222"}},
+		{"stack", grp.New("foo", "prod", "us-east-1", "staging", ""), []string{"i-55555555", "i-66666666", "i-77777777", "i-88888888"}},
+		{"app", grp.New("foo", "prod", "us-east-1", "", ""), []string{"i-11111111", "i-22222222", "i-33333333", "i-44444444", "i-55555555", "i-66666666", "i-77777777", "i-88888888"}},
+		{"cluster, all regions", grp.New("foo", "prod", "", "", "foo-prod"),[]string{"i-11111111", "i-22222222", "i-aaaaaaaa", "i-bbbbbbbb"}},
+	}
+
+
+	// setup
+	dep := mockDeployment()
+
+	for _, tt := range tests {
+		instances, err := Instances(tt.group, nil, dep)
+		if err != nil {
+			t.Fatalf("%+v", err)
+		}
+
+		// assertions
+		gots := ids(instances)
+
+		if got, want := len(gots), len(tt.wants); got != want {
+			t.Fatalf("%s: len(eligible.Instances(group, cfg, app))=%v, want %v", tt.label, got, want)
+		}
+
+		for i, got := range gots {
+			if want := tt.wants[i]; got != want {
+				t.Fatalf("%s: got=%v, want=%v", tt.label, got, want)
+			}
+		}
+	}
+}
