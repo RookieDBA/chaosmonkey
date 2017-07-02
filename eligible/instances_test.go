@@ -107,17 +107,7 @@ func mockDep() D.Deployment {
 			}})
 }
 
-func testConfig(grouping chaosmonkey.Group) chaosmonkey.AppConfig {
-	return chaosmonkey.AppConfig{
-		Enabled:                        true,
-		RegionsAreIndependent:          true,
-		MeanTimeBetweenKillsInWorkDays: 5,
-		MinTimeBetweenKillsInWorkDays:  1,
-		Grouping:                       grouping,
-	}
-}
-
-func TestGetEligibleInstances(t *testing.T) {
+func TestInstances(t *testing.T) {
 	dep := mockDep()
 	group := grp.New("mock", "prod", "us-east-1", "", "mock-prod-a")
 
@@ -165,7 +155,7 @@ func TestMultipleExceptions(t *testing.T) {
 	}
 	got, want := len(instances), 6
 	if got != want {
-		t.Fatalf("len(eligibleInstances(group, cfg, app))=%v, want %v", got, want)
+		t.Fatalf("len(Instances(group, cfg, app))=%v, want %v", got, want)
 	}
 
 	// Ensure none of the excepted instances are in the list

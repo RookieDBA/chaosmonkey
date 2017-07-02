@@ -1,12 +1,12 @@
 package eligible
 
 import (
+	"github.com/Netflix/chaosmonkey"
 	D "github.com/Netflix/chaosmonkey/deploy"
 	"github.com/Netflix/chaosmonkey/grp"
 	"github.com/Netflix/chaosmonkey/mock"
-	"testing"
 	"sort"
-	"github.com/Netflix/chaosmonkey"
+	"testing"
 )
 
 func mockDeployment() D.Deployment {
@@ -16,9 +16,7 @@ func mockDeployment() D.Deployment {
 	r2 := D.RegionName("us-west-2")
 
 	return &mock.Deployment{AppMap: map[string]D.AppMap{
-		"foo": {a:
-		D.AccountInfo{CloudProvider: p, Clusters:
-		D.ClusterMap{
+		"foo": {a: D.AccountInfo{CloudProvider: p, Clusters: D.ClusterMap{
 			"foo-prod": {
 				r1: {"foo-prod-v001": []D.InstanceID{"i-11111111", "i-22222222"}},
 				r2: {"foo-prod-v001": []D.InstanceID{"i-aaaaaaaa", "i-bbbbbbbb"}}},
@@ -44,9 +42,8 @@ func ids(instances []chaosmonkey.Instance) []string {
 
 }
 
-
 func TestGroupings(t *testing.T) {
-	tests := []struct{
+	tests := []struct {
 		label string
 		group grp.InstanceGroup
 		wants []string
@@ -54,11 +51,10 @@ func TestGroupings(t *testing.T) {
 		{"cluster", grp.New("foo", "prod", "us-east-1", "", "foo-prod"), []string{"i-11111111", "i-22222222"}},
 		{"stack", grp.New("foo", "prod", "us-east-1", "staging", ""), []string{"i-55555555", "i-66666666", "i-77777777", "i-88888888"}},
 		{"app", grp.New("foo", "prod", "us-east-1", "", ""), []string{"i-11111111", "i-22222222", "i-33333333", "i-44444444", "i-55555555", "i-66666666", "i-77777777", "i-88888888"}},
-		{"cluster, all regions", grp.New("foo", "prod", "", "", "foo-prod"),[]string{"i-11111111", "i-22222222", "i-aaaaaaaa", "i-bbbbbbbb"}},
+		{"cluster, all regions", grp.New("foo", "prod", "", "", "foo-prod"), []string{"i-11111111", "i-22222222", "i-aaaaaaaa", "i-bbbbbbbb"}},
 		{"stack, all regions", grp.New("foo", "prod", "", "staging", ""), []string{"i-55555555", "i-66666666", "i-77777777", "i-88888888", "i-cccccccc", "i-dddddddd"}},
 		{"app, all regions", grp.New("foo", "prod", "", "", ""), []string{"i-11111111", "i-22222222", "i-33333333", "i-44444444", "i-55555555", "i-66666666", "i-77777777", "i-88888888", "i-aaaaaaaa", "i-bbbbbbbb", "i-cccccccc", "i-dddddddd"}},
 	}
-
 
 	// setup
 	dep := mockDeployment()
@@ -84,4 +80,8 @@ func TestGroupings(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestExceptions(t *testing.T) {
+
 }
