@@ -1,7 +1,6 @@
 package eligible
 
 import (
-	"github.com/Netflix/chaosmonkey"
 	"github.com/Netflix/chaosmonkey/grp"
 	"github.com/Netflix/chaosmonkey/mock"
 	"testing"
@@ -9,18 +8,11 @@ import (
 
 func TestClusterGropuing(t *testing.T) {
 	// setup
-	appConfig := chaosmonkey.AppConfig{
-		Enabled:                        true,
-		RegionsAreIndependent:          true,
-		MeanTimeBetweenKillsInWorkDays: 5,
-		MinTimeBetweenKillsInWorkDays:  1,
-		Grouping:                       chaosmonkey.Cluster,
-	}
 	dep := mock.Deployment()
 	group := grp.New("foo", "prod", "us-east-1", "", "foo-prod")
 
 	// code under test
-	instances, err := Instances(group, appConfig.Exceptions, dep)
+	instances, err := Instances(group, nil, dep)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
