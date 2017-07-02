@@ -17,7 +17,6 @@ package eligible
 import (
 	"testing"
 
-	"github.com/Netflix/chaosmonkey"
 	D "github.com/Netflix/chaosmonkey/deploy"
 	"github.com/Netflix/chaosmonkey/grp"
 	"github.com/Netflix/chaosmonkey/mock"
@@ -25,7 +24,6 @@ import (
 
 // Test that canaries are not considered eligible instances
 func TestNoKillCanaries(t *testing.T) {
-	cfg := testConfig(chaosmonkey.Cluster)
 	usEast1 := D.RegionName("us-east-1")
 	usWest2 := D.RegionName("us-west-2")
 
@@ -91,7 +89,7 @@ func TestNoKillCanaries(t *testing.T) {
 
 	// Group is all instances in mock app, prod group
 	group := grp.New("mock", "prod", "", "", "")
-	instances, err := Instances(group, cfg.Exceptions, dep)
+	instances, err := Instances(group, nil, dep)
 	if err != nil {
 		t.Fatal(err)
 	}
