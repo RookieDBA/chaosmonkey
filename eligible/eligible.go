@@ -141,7 +141,8 @@ func clusters(group grp.InstanceGroup, cloudProvider deploy.CloudProvider, exs [
 			}
 
 			if grp.Contains(group, string(account), string(region), string(clusterName)) {
-				result = append(result, cluster{appName: deploy.AppName(names.App),
+				result = append(result, cluster{
+					appName: deploy.AppName(names.App),
 					accountName:   account,
 					cloudProvider: cloudProvider,
 					regionName:    region,
