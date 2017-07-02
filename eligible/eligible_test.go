@@ -81,7 +81,3 @@ func TestGroupings(t *testing.T) {
 		}
 	}
 }
-
-func TestExceptions(t *testing.T) {
-
-}
