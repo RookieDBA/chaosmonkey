@@ -520,8 +520,8 @@ func (s Spinnaker) GetClusterNames(app string, account D.AccountName) (clusters 
 	}
 
 	var pcl struct {
-		Clusters map[string][]struct {
-			Name string
+		Clusters map[D.AccountName][]struct {
+			Name D.ClusterName
 		}
 	}
 
@@ -530,11 +530,11 @@ func (s Spinnaker) GetClusterNames(app string, account D.AccountName) (clusters 
 		return nil, errors.Wrapf(err, "failed to parse json at %s", url)
 	}
 
-	cls := pcl.Clusters[string(account)]
+	cls := pcl.Clusters[account]
 
 	clusters = make([]D.ClusterName, len(cls))
 	for i, cl := range cls {
-		clusters[i] = D.ClusterName(cl.Name)
+		clusters[i] = cl.Name
 	}
 
 	return clusters, nil
@@ -564,7 +564,7 @@ func (s Spinnaker) GetRegionNames(app string, account D.AccountName, cluster D.C
 	}
 
 	var cl struct {
-		ServerGroups []struct{ Region string }
+		ServerGroups []struct{ Region D.RegionName }
 	}
 
 	err = json.Unmarshal(body, &cl)
@@ -572,14 +572,14 @@ func (s Spinnaker) GetRegionNames(app string, account D.AccountName, cluster D.C
 		return nil, errors.Wrapf(err, "failed to parse json at %s", url)
 	}
 
-	set := make(map[string]bool)
+	set := make(map[D.RegionName]bool)
 	for _, g := range cl.ServerGroups {
 		set[g.Region] = true
 	}
 
 	result := make([]D.RegionName, 0, len(set))
 	for region := range set {
-		result = append(result, D.RegionName(region))
+		result = append(result, region)
 	}
 
 	return result, nil

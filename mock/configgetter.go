@@ -21,10 +21,12 @@ type ConfigGetter struct {
 	Config chaosmonkey.AppConfig
 }
 
+// NewConfigGetter returns a mock config getter that always returns the specified config
 func NewConfigGetter(config chaosmonkey.AppConfig) ConfigGetter {
 	return ConfigGetter{Config: config}
 }
 
+// DefaultConfigGetter returns a mock config getter that always returns the same config
 func DefaultConfigGetter() ConfigGetter {
 	return ConfigGetter{
 		Config: chaosmonkey.AppConfig{
