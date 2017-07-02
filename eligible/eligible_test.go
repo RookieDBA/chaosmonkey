@@ -6,6 +6,7 @@ import (
 	"github.com/Netflix/chaosmonkey/mock"
 	"testing"
 	"sort"
+	"github.com/Netflix/chaosmonkey"
 )
 
 func mockDeployment() D.Deployment {
@@ -37,14 +38,15 @@ func TestClusterGropuing(t *testing.T) {
 	}
 
 	// assertions
+	gots := ids(instances)
 	wants := []string{"i-11111111", "i-22222222"}
 
-	if got, want := len(instances), len(wants); got != want {
+	if got, want := len(gots), len(wants); got != want {
 		t.Fatalf("len(eligible.Instances(group, cfg, app))=%v, want %v", got, want)
 	}
 
-	for i, inst := range instances {
-		if got, want := inst.ID(), wants[i]; got != want {
+	for i, got := range gots {
+		if want := wants[i]; got != want {
 			t.Fatalf("got=%v, want=%v", got, want)
 		}
 	}
@@ -62,17 +64,30 @@ func TestStackGrouping(t *testing.T) {
 	}
 
 	// assertions
+	gots := ids(instances)
 	wants := []string{"i-55555555", "i-66666666", "i-77777777", "i-88888888"}
 
-	if got, want := len(instances), len(wants); got != want {
+	if got, want := len(gots), len(wants); got != want {
 		t.Fatalf("len(eligible.Instances(group, cfg, app))=%v, want %v", got, want)
 	}
 
-	for i, inst := range instances {
-		if got, want := inst.ID(), wants[i]; got != want {
+	for i, got := range gots {
+		if want := wants[i]; got != want {
 			t.Fatalf("got=%v, want=%v", got, want)
 		}
 	}
+}
+
+// ids returns a sorted list of instance ids
+func ids(instances []chaosmonkey.Instance) []string {
+	result := make([]string, len(instances))
+	for i, inst := range instances {
+		result[i] = inst.ID()
+	}
+
+	sort.Strings(result)
+	return result
+
 }
 
 func TestAppGrouping(t *testing.T) {
@@ -86,14 +101,8 @@ func TestAppGrouping(t *testing.T) {
 		t.Fatalf("%+v", err)
 	}
 
-	gots := make([]string, len(instances))
-	for i, inst := range instances {
-		gots[i] = inst.ID()
-	}
-
-	sort.Strings(gots)
-
 	// assertions
+	gots := ids(instances)
 	wants := []string{"i-11111111", "i-22222222", "i-33333333", "i-44444444", "i-55555555", "i-66666666", "i-77777777", "i-88888888"}
 
 	if got, want := len(gots), len(wants); got != want {
