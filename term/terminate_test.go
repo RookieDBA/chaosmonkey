@@ -35,7 +35,7 @@ func mockDeps() deps.Deps {
 	recorder := mock.Checker{Error: nil}
 	confGetter := mock.DefaultConfigGetter()
 	cl := clock.New()
-	dep := mock.Deployment()
+	dep := mock.Dep()
 	ttor := mock.Terminator{}
 	ou := mock.Outage{}
 	env := mock.Env{IsInTest: false}

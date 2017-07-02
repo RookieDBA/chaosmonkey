@@ -18,15 +18,15 @@ import D "github.com/Netflix/chaosmonkey/deploy"
 
 const cloudProvider = "aws"
 
-// Deployment returns a mock implementation of deploy.Deployment
-// Deployment has 4 apps: foo, bar, baz, quux
+// Dep returns a mock implementation of deploy.Deployment
+// Dep has 4 apps: foo, bar, baz, quux
 // Each app runs in 1 account:
 //    foo, bar, baz run in prod
 //    quux runs in test
 // Each app has one cluster: foo-prod, bar-prod, baz-prod
 // Each cluster runs in one region: us-east-1
 // Each cluster contains 1 AZ with two instances
-func Deployment() D.Deployment {
+func Dep() D.Deployment {
 	prod := D.AccountName("prod")
 	test := D.AccountName("test")
 	usEast1 := D.RegionName("us-east-1")

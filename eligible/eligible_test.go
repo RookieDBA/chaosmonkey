@@ -8,7 +8,7 @@ import (
 
 func TestClusterGropuing(t *testing.T) {
 	// setup
-	dep := mock.Deployment()
+	dep := mock.Dep()
 	group := grp.New("foo", "prod", "us-east-1", "", "foo-prod")
 
 	// code under test
@@ -29,4 +29,8 @@ func TestClusterGropuing(t *testing.T) {
 			t.Fatalf("got=%v, want=%v", got, want)
 		}
 	}
+}
+
+func TestStackGrouping(t *testing.T) {
+
 }
