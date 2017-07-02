@@ -120,15 +120,14 @@ func testConfig(grouping chaosmonkey.Group) chaosmonkey.AppConfig {
 func TestGetEligibleInstances(t *testing.T) {
 	dep := mockDep()
 	group := grp.New("mock", "prod", "us-east-1", "", "mock-prod-a")
-	cfg := testConfig(chaosmonkey.Cluster)
 
-	instances, err := Instances(group, cfg, dep)
+	instances, err := Instances(group, nil, dep)
 	if err != nil {
 		t.Fatal(err)
 	}
 	got, want := len(instances), 1
 	if got != want {
-		t.Fatalf("len(eligibleInstances(group, cfg, app))=%v, want %v", got, want)
+		t.Fatalf("len(Instances(group, nil, dep))=%v, want %v", got, want)
 	}
 
 	if instances[0].ID() != "i-4a003cd0" {
@@ -136,34 +135,17 @@ func TestGetEligibleInstances(t *testing.T) {
 	}
 }
 
-func TestDisabled(t *testing.T) {
-	dep := mockDep()
-	group := grp.New("mock", "prod", "us-east-1", "", "mock-prod-a")
-	cfg := testConfig(chaosmonkey.Cluster)
-	cfg.Enabled = false
-
-	instances, err := Instances(group, cfg, dep)
-	if err != nil {
-		t.Fatal(err)
-	}
-	got, want := len(instances), 0
-	if got != want {
-		t.Fatalf("len(eligibleInstances(group, cfg, app))=%v, want %v", got, want)
-	}
-}
-
 func TestSimpleException(t *testing.T) {
 	dep := mockDep()
 	group := grp.New("mock", "prod", "us-east-1", "", "mock-prod-a")
-	cfg := testConfig(chaosmonkey.Cluster)
-	cfg.Exceptions = []chaosmonkey.Exception{{Account: "prod", Stack: "prod", Detail: "a", Region: "us-east-1"}}
-	instances, err := Instances(group, cfg, dep)
+	exs := []chaosmonkey.Exception{{Account: "prod", Stack: "prod", Detail: "a", Region: "us-east-1"}}
+	instances, err := Instances(group, exs, dep)
 	if err != nil {
 		t.Fatal(err)
 	}
 	got, want := len(instances), 0
 	if got != want {
-		t.Fatalf("len(eligibleInstances(group, cfg, app))=%v, want %v", got, want)
+		t.Fatalf("len(Instances(group, exs, dep))=%v, want %v", got, want)
 	}
 }
 
@@ -171,14 +153,13 @@ func TestMultipleExceptions(t *testing.T) {
 	app := abcloudMockDep()
 	// Group across everything in prod
 	group := grp.New("abcloud", "prod", "", "", "")
-	cfg := testConfig(chaosmonkey.Cluster)
-	cfg.Exceptions = []chaosmonkey.Exception{
+	exs := []chaosmonkey.Exception{
 		{Account: "prod", Stack: "batch", Detail: "", Region: "eu-west-1"},
 		{Account: "prod", Stack: "ecom", Detail: "", Region: "us-west-2"},
 		{Account: "prod", Stack: "", Detail: "", Region: "us-west-2"},
 	}
 
-	instances, err := Instances(group, cfg, app)
+	instances, err := Instances(group, exs, app)
 	if err != nil {
 		t.Fatal(err)
 	}

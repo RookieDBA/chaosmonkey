@@ -91,7 +91,7 @@ func TestNoKillCanaries(t *testing.T) {
 
 	// Group is all instances in mock app, prod group
 	group := grp.New("mock", "prod", "", "", "")
-	instances, err := Instances(group, cfg, dep)
+	instances, err := Instances(group, cfg.Exceptions, dep)
 	if err != nil {
 		t.Fatal(err)
 	}

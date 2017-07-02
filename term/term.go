@@ -126,11 +126,14 @@ func doTerminate(d deps.Deps, group grp.InstanceGroup) error {
 		return errors.Wrapf(err, "not terminating: Could not retrieve config for app=%s", appName)
 	}
 
-	// Even though EligibleInstances (called by PickRandomInstance) will check
-	// the appcFg.Enabled flag as well, the logging messages are more meaningful
-	// if we check here and bail out early with a more informative log message
 	if !appCfg.Enabled {
 		log.Printf("not terminating: enabled=false for app=%s", appName)
+		return nil
+	}
+
+
+	if appCfg.Whitelist != nil {
+		log.Printf("not terminating: app=%s has a whitelist which is no longer supported", appName)
 		return nil
 	}
 
@@ -180,7 +183,7 @@ func doTerminate(d deps.Deps, group grp.InstanceGroup) error {
 
 // PickRandomInstance randomly selects an eligible instance from a group
 func PickRandomInstance(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.Deployment) (chaosmonkey.Instance, bool) {
-	instances, err := eligible.Instances(group, cfg, dep)
+	instances, err := eligible.Instances(group, cfg.Exceptions, dep)
 	if err != nil {
 		log.Printf("WARNING: eligible.Instances failed for %s: %v", group, err)
 		return nil, false

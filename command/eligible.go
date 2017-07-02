@@ -34,7 +34,7 @@ func Eligible(g chaosmonkey.AppConfigGetter, d deploy.Deployment, app, account, 
 	}
 
 	group := grp.New(app, account, region, stack, cluster)
-	instances, err := eligible.Instances(group, *cfg, d)
+	instances, err := eligible.Instances(group, cfg.Exceptions, d)
 	if err != nil {
 		fmt.Print(err)
 		os.Exit(1)

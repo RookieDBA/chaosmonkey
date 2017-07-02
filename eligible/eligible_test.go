@@ -20,7 +20,7 @@ func TestClusterGropuing(t *testing.T) {
 	group := grp.New("foo", "prod", "us-east-1", "", "foo-prod")
 
 	// code under test
-	instances, err := Instances(group, appConfig, dep)
+	instances, err := Instances(group, appConfig.Exceptions, dep)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}

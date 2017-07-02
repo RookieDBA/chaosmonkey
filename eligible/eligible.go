@@ -148,17 +148,13 @@ func isWhitelist(err error) bool {
 }
 
 // Instances returns instances eligible for termination
-func Instances(group grp.InstanceGroup, cfg chaosmonkey.AppConfig, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
-	if cfg.Whitelist != nil {
-		return nil, errors.New(whiteListErrorMessage)
-	}
-
+func Instances(group grp.InstanceGroup, exs []chaosmonkey.Exception, dep deploy.Deployment) ([]chaosmonkey.Instance, error) {
 	cloudProvider, err := dep.CloudProvider(group.Account())
 	if err != nil {
 		return nil, errors.Wrap(err, "retrieve cloud provider failed")
 	}
 
-	cls, err := clusters(group, deploy.CloudProvider(cloudProvider), cfg.Exceptions, dep)
+	cls, err := clusters(group, deploy.CloudProvider(cloudProvider), exs, dep)
 	if err != nil {
 		return nil, err
 	}
