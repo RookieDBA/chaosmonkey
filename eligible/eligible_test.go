@@ -21,7 +21,7 @@ func TestClusterGropuing(t *testing.T) {
 	// assertions
 	wants := []string{"i-11111111", "i-22222222"}
 
-	if got, want := len(instances), 2; got != want {
+	if got, want := len(instances), len(wants); got != want {
 		t.Fatalf("len(eligible.Instances(group, cfg, app))=%v, want %v", got, want)
 	}
 
@@ -44,7 +44,7 @@ func mockDeployment() D.Deployment {
 				"foo-prod": {r: {"foo-prod-v001": []D.InstanceID{"i-11111111", "i-22222222"}}},
 				"foo-prod-lorin": {r: {"foo-prod-lorin-v123": []D.InstanceID{"i-33333333", "i-44444444"}}},
 				"foo-staging": {r: {"foo-staging-v005": []D.InstanceID{"i-55555555", "i-66666666"}}},
-				"foo-staging-lorin": {r: {"foo-prod-lorin-v117": []D.InstanceID{"i-77777777", "i-77777777"}}},
+				"foo-staging-lorin": {r: {"foo-prod-lorin-v117": []D.InstanceID{"i-77777777", "i-88888888"}}},
 			}},
 		}}}
 }
@@ -61,9 +61,9 @@ func TestStackGrouping(t *testing.T) {
 	}
 
 	// assertions
-	wants := []string{"i-d3e3d611", "i-63f52e25"}
+	wants := []string{"i-55555555", "i-66666666", "i-77777777", "i-88888888"}
 
-	if got, want := len(instances), 2; got != want {
+	if got, want := len(instances), len(wants); got != want {
 		t.Fatalf("len(eligible.Instances(group, cfg, app))=%v, want %v", got, want)
 	}
 
